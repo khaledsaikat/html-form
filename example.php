@@ -1,25 +1,8 @@
-# Html-Form
-PHP class for html form builder
-
-## Requirements
-
-- PHP 5.4+
-
-## Get Started
-
-First of all include ```Form.php``` to project and make use of ```use UserMeta\Html\Form;``` to enable ```Form``` class inside project.
-
-```
 <?php
-require_once "src/Form.php";
+
+require_once "./src/Form.php";
 
 use UserMeta\Html\Form;
-```
-
-
-## Examples
-
-```
 
 /**
  * Create a text field with default value
@@ -65,4 +48,3 @@ echo Form::radio(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'ca
  * Create a lebel with label text, id, class and for attributes
  */
 echo Form::label('Some text', ['id' => 'ID', 'class' => 'Class', 'for' => 'for']);
-```

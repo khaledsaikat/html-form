@@ -2,40 +2,188 @@
 
 namespace UserMeta\Html;
 
-class Form
-{
+/*
+ * Class for html form builder.
+ *
+ * @author Khaled Hossain
+ */
+
+if (!class_exists('Form')) {
+    class Form
+    {
+        /**
+     * Input type.
+     */
     public $type;
 
+    /**
+     * Default value.
+     */
     public $default;
 
+    /**
+     * Input attributes.
+     */
     public $attributes = [];
 
+    /**
+     * Options array for select | multiselect | radio | checkboxList.
+     */
     public $options = [];
 
+    /**
+     * Generate text input.
+     *
+     * @param string $default:    Default value attribute
+     * @param array  $attributes: (optional)
+     *
+     * @return string : html text input
+     */
+    protected function text($default = null, array $attributes = [])
+    {
+        return $this->input('text', $default, $attributes);
+    }
+
+    /**
+     * Generate label.
+     *
+     * @param string $default:    Text for label
+     * @param array  $attributes: (optional)
+     *
+     * @return string : html label
+     */
     protected function label($default = null, array $attributes = [])
     {
+        $this->setProperties('label', $default, $attributes);
+
         return "<label{$this->attributes()}>$default</label>";
     }
 
+    /**
+     * Generate single checkbox.
+     *
+     * @param bool  $default:    true, 1 or any value for checked and false or 0 for unchecked
+     * @param array $attributes: (optional)
+     *
+     * @return string : html checkbox
+     */
+    protected function checkbox($default = false, array $attributes = [])
+    {
+        $this->setProperties('checkbox', $default, $attributes);
+        $this->_refineInputAttributes();
+
+        $this->attributes['value'] = !empty($attributes['value']) ? $attributes['value'] : '1';
+
+        if ($default) {
+            $this->attributes['checked'] = 'checked';
+        }
+
+        return $this->_createInput();
+    }
+
+    /**
+     * Generate html input.
+     *
+     * @param string $type:      Input type attribute
+     * @param string $default:   Default value attribute
+     * @param array  $attributes
+     *
+     * @return string : Generic html input
+     */
+    protected function input($type, $default = null, array $attributes = [])
+    {
+        $this->setProperties($type, $default, $attributes);
+        $this->_refineInputAttributes();
+
+        return $this->_createInput();
+    }
+
+    /**
+     * Generate html select.
+     *
+     * @param string $default:   Default selected value
+     * @param array  $attributes
+     * @param array  $options:   Dropdown options
+     *
+     * @return string : html select
+     */
     protected function dropdown($default = null, array $attributes = [], array $options = [])
     {
         return $this->select($default, $attributes, $options);
     }
 
+    /**
+     * Generate html select.
+     *
+     * @param string $default:   Default selected value
+     * @param array  $attributes
+     * @param array  $options:   Dropdown options
+     *
+     * @return string : html select
+     */
     protected function select($default = null, array $attributes = [], array $options = [])
     {
         $this->setProperties('select', $default, $attributes, $options);
 
         $html = "<select{$this->attributes()}>";
         foreach ($this->options as $option) {
-            $html .= "<option value=\"{$option['value']}\"{$this->_optionsAttributes($option)}>{$option['label']}</option>";
+            $html .= "<option value=\"{$option['value']}\"{$this->optionsAttributes($option)}>{$option['label']}</option>";
         }
         $html .= '</select>';
 
         return $html;
     }
 
-    private function _optionsAttributes(array $option)
+    /**
+     * Generate list of radios.
+     *
+     * @param string $default:   Default checked value
+     * @param array  $attributes
+     * @param array  $options:   Dropdown options
+     *
+     * @return string : html radio
+     */
+    protected function radio($default = null, array $attributes = [], array $options = [])
+    {
+        $this->setProperties('radio', $default, $attributes, $options);
+
+        $html = '';
+        foreach ($this->options as $option) {
+            $html .= "<label><input type=\"radio\" value=\"{$option['value']}\"{$this->optionsAttributes($option)}/> {$option['label']}</label>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Generate list of checkboxes.
+     *
+     * @param string | array $default:   Default checked value
+     * @param array          $attributes
+     * @param array          $options:   Dropdown options
+     *
+     * @return string : html checkboxes
+     */
+    protected function checkboxList($default = null, array $attributes = [], array $options = [])
+    {
+        $this->setProperties('checkbox', $default, $attributes, $options);
+
+        $html = '';
+        foreach ($this->options as $option) {
+            $html .= "<label><input type=\"checkbox\" value=\"{$option['value']}\"{$this->optionsAttributes($option)}/> {$option['label']}</label>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Building options attributes.
+     *
+     * @param array $options
+     *
+     * @return string : html atributes
+     */
+    private function optionsAttributes(array $option)
     {
         return $this->_selectedAttribute($option);
     }
@@ -45,7 +193,7 @@ class Form
      *
      * @param array $option: single option contains key 'value'
      *
-     * @return string: <space>selected="selected" | <space>checked="checked" | ""
+     * @return string: <space>selected="selected" | <space>checked="checked" | ''
      */
     private function _selectedAttribute(array $option)
     {
@@ -61,6 +209,7 @@ class Form
             break;
 
             case 'checkbox':
+            case 'radio':
                 $text = ' checked="checked"';
             break;
         }
@@ -72,47 +221,6 @@ class Form
         }
 
         return $selected;
-    }
-
-    protected function radio($default = null, array $attributes = [], array $options = [])
-    {
-
-        /*$this->setProperties('radio', $default, $attributes, $options);
-
-        $html = "<select{$this->attributes()}>";
-        foreach ($this->options as $option) {
-            $html .= "<option value=\"{$option['value']}\"{$this->_optionsAttributes($option)}>{$option['label']}</option>";
-        }
-        $html .= '</select>';
-
-        return $html;*/
-
-        $this->setProperties('radio', $default, $attributes, $options);
-
-        $html = '';
-        foreach ($this->options as $option) {
-            $radio = $this->_singleCheckboxRadio('radio', $default, $attributes);
-
-            //$html .= "<option value=\"{$option['value']}\"{$this->_optionsAttributes($option)}>{$option['label']}</option>";
-
-            $html .= "<label>$radio {$option['label']}</label>";
-        }
-
-        return $html;
-    }
-
-    protected function checkboxList($default = null, array $attributes = [], array $options = [])
-    {
-        $this->setOptions($options);
-
-        $html = '';
-        foreach ($this->options as $option) {
-            $checkbox = $this->checkbox($default, $attributes);
-
-            $html .= "<label>$checkbox {$option['label']}</label>";
-        }
-
-        return $html;
     }
 
     /**
@@ -146,110 +254,79 @@ class Form
         $this->options = $options;
     }
 
-    private function buildOptions()
-    {
-        $html = '';
-        foreach ($this->options as $option) {
-            if (!empty($option['type']) && $option['type'] == 'optgroup') {
-                if (isset($option['label']) && $option['label'] == '__end__') {
-                    $html .= $this->groupEnd();
-                    $inGroup = false;
-                } else {
-                    if (!empty($inGroup)) {
+        private function buildOptions_()
+        {
+            $html = '';
+            foreach ($this->options as $option) {
+                if (!empty($option['type']) && $option['type'] == 'optgroup') {
+                    if (isset($option['label']) && $option['label'] == '__end__') {
                         $html .= $this->groupEnd();
+                        $inGroup = false;
+                    } else {
+                        if (!empty($inGroup)) {
+                            $html .= $this->groupEnd();
+                        }
+
+                        $html .= $this->groupStart($option);
+                        $inGroup = true;
                     }
-
-                    $html .= $this->groupStart($option);
-                    $inGroup = true;
+                } else {
+                    $html .= $this->buildSingleOption($option);
                 }
-            } else {
-                $html .= $this->buildSingleOption($option);
             }
+
+            if (!empty($inGroup)) {
+                $html .= $this->groupEnd();
+            }
+
+            return $html;
         }
 
-        if (!empty($inGroup)) {
-            $html .= $this->groupEnd();
-        }
+        private function buildSingleOption_($option)
+        {
+            $html = '';
 
-        return $html;
-    }
+            $value = isset($option['value']) ? $option['value'] : '';
+            $label = isset($option['label']) ? $option['label'] : '';
 
-    private function buildSingleOption($option)
-    {
-        $html = '';
+            $attributes = $this->buildOptionAttributes($option);
 
-        $value = isset($option['value']) ? $option['value'] : '';
-        $label = isset($option['label']) ? $option['label'] : '';
-
-        $attributes = $this->buildOptionAttributes($option);
-
-        if (is_array($this->storedValue)) {
-            $attributes .= in_array($value, $this->storedValue) ? $this->selected : '';
-        } else {
-            $attributes .= ($this->storedValue == $value) ? $this->selected : '';
-        }
+            if (is_array($this->storedValue)) {
+                $attributes .= in_array($value, $this->storedValue) ? $this->selected : '';
+            } else {
+                $attributes .= ($this->storedValue == $value) ? $this->selected : '';
+            }
 
         //if (!empty($this->config['option_before'])) {
         //    $html .= $this->config['option_before'];
         //}
 
         $args = compact('attributes', 'value', 'label');
-        $html .= $this->getSingleOption($args, $option);
+            $html .= $this->getSingleOption($args, $option);
 
         //if (!empty($this->config['option_after'])) {
         //    $html .= $this->config['option_after'];
         //}
 
         return $html;
-    }
-
-    protected function checkbox($default = false, array $attributes = [])
-    {
-        return $this->_singleCheckboxRadio('checkbox', $default, $attributes);
-    }
-
-    private function _singleCheckboxRadio($type, $default, array $attributes)
-    {
-        $this->setProperties($type, $default, $attributes);
-        $this->_refineInputAttributes();
-
-        if ($type == 'checkbox') {
-            $this->attributes['value'] = !empty($attributes['value']) ? $attributes['value'] : '1';
         }
-
-        if ($default) {
-            $this->attributes['checked'] = 'checked';
-        }
-
-        return $this->_createInput();
-    }
-
-    protected function text($default = null, array $attributes = [])
-    {
-        return $this->input('text', $default, $attributes);
-    }
 
     /**
-     * Generate checkbox.
-     *
-     * @param bool  $default:   true for checked else false
-     * @param array $attributes
-     *
-     * @return string : html
+     * Creating input.
      */
-    protected function input($type, $default = null, array $attributes = [])
-    {
-        $this->setProperties($type, $default, $attributes);
-        $this->_refineInputAttributes();
-
-        return $this->_createInput();
-    }
-
     private function _createInput()
     {
         return '<input'.$this->attributes().'/>';
     }
 
+    /**
+     * Set class properties.
+     *
+     * @param string $type:      Input type attribute
+     * @param string $default:   Default value attribute
+     * @param array  $attributes
+     * @param array  $options
+     */
     private function setProperties($type, $default, array $attributes, array $options = [])
     {
         $this->type = $type ?: 'text';
@@ -259,6 +336,10 @@ class Form
         $this->setOptions($options);
     }
 
+    /**
+     * Adding type and value to $this->attributes
+     * Useful for making text fields.
+     */
     private function _refineInputAttributes()
     {
         $this->attributes = array_merge([
@@ -277,9 +358,9 @@ class Form
         $html = '';
 
         $attributes = $this->attributes;
-        $attributes = $this->_onlyNonEmpty($attributes);
-        $attributes = $this->_onlyString($attributes);
-        $attributes = $this->_removeKeys($attributes, ['label']);
+        $attributes = $this->onlyNonEmpty($attributes);
+        $attributes = $this->onlyString($attributes);
+        $attributes = $this->removeKeys($attributes, ['label']);
 
         if (empty($attributes)) {
             return $html;
@@ -300,7 +381,7 @@ class Form
      *
      * @return array
      */
-    private function _removeKeys(array $data, array $keys)
+    private function removeKeys(array $data, array $keys)
     {
         foreach ($data as $key => $itm) {
             if (in_array($key, $keys)) {
@@ -318,10 +399,10 @@ class Form
      *
      * @return array
      */
-    private function _onlyString(array $data)
+    private function onlyString(array $data)
     {
         foreach ($data as $key => $itm) {
-            if (!$this->_isString($itm)) {
+            if (!$this->isString($itm)) {
                 unset($data[$key]);
             }
         }
@@ -336,7 +417,7 @@ class Form
      *
      * @return array
      */
-    private function _onlyNonEmpty(array $data)
+    private function onlyNonEmpty(array $data)
     {
         foreach ($data as $key => $itm) {
             if (empty($itm)) {
@@ -354,7 +435,7 @@ class Form
      *
      * @return bool
      */
-    private function _isString($data)
+    private function isString($data)
     {
         if (in_array(gettype($data), ['array', 'object'])) {
             return false;
@@ -363,20 +444,24 @@ class Form
         return true;
     }
 
-    protected function test()
-    {
-        return 'test';
-    }
+        public static function registerForm()
+        {
+            return ['form' => new self()];
+        }
 
-    public static function registerForm()
-    {
-        return ['form' => new self()];
-    }
-
+    /**
+     * Call static methods. eg: Form::text('something');.
+     *
+     * @param string $method: Method name to call
+     * @param array  $args:   Arguments array to pass to invocked method call
+     *
+     * @return method return
+     */
     public static function __callStatic($method, $args)
     {
         $instance = new self();
 
         return call_user_func_array([$instance, $method], $args);
+    }
     }
 }

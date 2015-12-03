@@ -14,46 +14,51 @@ class FormTest extends TestCase
 
     public function testIsString()
     {
-        $data = $this->invokeMethod($this->form, '_isString', ['abc']);
+        $data = $this->invokeMethod($this->form, 'isString', ['abc']);
         $this->assertTrue($data);
 
-        $data = $this->invokeMethod($this->form, '_isString', ['1']);
+        $data = $this->invokeMethod($this->form, 'isString', ['1']);
         $this->assertTrue($data);
 
-        $data = $this->invokeMethod($this->form, '_isString', ['0']);
+        $data = $this->invokeMethod($this->form, 'isString', ['0']);
         $this->assertTrue($data);
 
-        $data = $this->invokeMethod($this->form, '_isString', ['']);
+        $data = $this->invokeMethod($this->form, 'isString', ['']);
         $this->assertTrue($data);
 
-        $data = $this->invokeMethod($this->form, '_isString', [null]);
+        $data = $this->invokeMethod($this->form, 'isString', [null]);
         $this->assertTrue($data);
 
-        $data = $this->invokeMethod($this->form, '_isString', [[]]);
+        $data = $this->invokeMethod($this->form, 'isString', [[]]);
         $this->assertFalse($data);
 
-        $data = $this->invokeMethod($this->form, '_isString', [new stdClass]);
+        $data = $this->invokeMethod($this->form, 'isString', [new stdClass]);
         $this->assertFalse($data);
     }
 
     public function testOnlyNonEmpty()
     {
-        $data = $this->invokeMethod($this->form, '_onlyNonEmpty', [['a' => 'A', 'b' => '', 'c' => 'C']]);
+        $data = $this->invokeMethod($this->form, 'onlyNonEmpty', [['a' => 'A', 'b' => '', 'c' => 'C']]);
         $this->assertCount(2, $data);
     }
 
     public function testOnlyString()
     {
-        $data = $this->invokeMethod($this->form, '_onlyString', [['a' => 'A', 'b' => [], 'c' => 'C']]);
+        $data = $this->invokeMethod($this->form, 'onlyString', [['a' => 'A', 'b' => [], 'c' => 'C']]);
         $this->assertCount(2, $data);
     }
 
     public function testRemoveKeys()
     {
-        $data = $this->invokeMethod($this->form, '_removeKeys', [$this->dummyArray, ['class']]);
+        $data = $this->invokeMethod($this->form, 'removeKeys', [$this->dummyArray, ['class']]);
         $this->assertFalse(isset($data['class']));
     }
 
+    /**
+     * @depends testOnlyNonEmpty
+     * @depends testOnlyString
+     * @depends testRemoveKeys
+     */
     public function testAttributes()
     {
         $this->setProperty($this->form, 'attributes', [
@@ -68,16 +73,6 @@ class FormTest extends TestCase
 
         $data = $this->invokeMethod($this->form, 'attributes');
         $this->assertEquals(' value="Value" id="ID" class="Class"', $data);
-    }
-
-    public function testSetProperties()
-    {
-        $arg = ['email', 'noreply@email.com', $this->dummyArray];
-        $this->invokeMethod($this->form, 'setProperties', $arg);
-
-        $this->assertEquals('email', $this->form->type);
-        $this->assertEquals('noreply@email.com', $this->form->default);
-        //$this->assertEquals(array_merge(['type' => 'email', 'value' => 'noreply@email.com'], $this->dummyArray), $this->form->attributes);
     }
 
     /**
@@ -103,6 +98,19 @@ class FormTest extends TestCase
         ];
     }
 
+    /**
+     * @depends testSetOptions
+     */
+    public function testSetProperties()
+    {
+        $arg = ['email', 'noreply@email.com', ['id' => 'ID', 'class' => 'Class']];
+        $this->invokeMethod($this->form, 'setProperties', $arg);
+
+        $this->assertEquals('email', $this->form->type);
+        $this->assertEquals('noreply@email.com', $this->form->default);
+        $this->assertEquals(['id' => 'ID', 'class' => 'Class'], $this->form->attributes);
+    }
+
     public function testInput()
     {
         $data = Form::input('text');
@@ -115,6 +123,9 @@ class FormTest extends TestCase
         $this->assertEquals('<input type="email" value="noreply@email.com" id="ID" class="Class"/>', $data);
     }
 
+    /**
+     * @depends testInput
+     */
     public function testText()
     {
         $data = Form::text();
@@ -148,16 +159,16 @@ class FormTest extends TestCase
         $this->assertEquals('', $data);
 
         $data = Form::checkboxList(null, [], ['a', 'b']);
-        //$this->assertEquals('<label><input type="checkbox" value="a"/> a</label><label><input type="checkbox" value="b"/> b</label>', $data);
+        $this->assertEquals('<label><input type="checkbox" value="a"/> a</label><label><input type="checkbox" value="b"/> b</label>', $data);
 
         $data = Form::checkboxList('b', [], ['a', 'b']);
-        //$this->assertEquals('', $data);
+        $this->assertEquals('<label><input type="checkbox" value="a"/> a</label><label><input type="checkbox" value="b" checked="checked"/> b</label>', $data);
 
-        $data = Form::checkboxList(['b', 'c'], [], ['a', 'b', 'c']);
-        //$this->assertEquals('', $data);
+        $data = Form::checkboxList(['a', 'b'], [], ['a', 'b']);
+        $this->assertEquals('<label><input type="checkbox" value="a" checked="checked"/> a</label><label><input type="checkbox" value="b" checked="checked"/> b</label>', $data);
 
-        $data = Form::checkboxList(['c', 'c'], ['id' => 'ID', 'class' => 'Class'], ['a', 'b', 'c']);
-        //$this->assertEquals('', $data);
+        $data = Form::checkboxList(['a'], ['id' => 'ID', 'class' => 'Class'], ['a' => 'A', 'b' => 'B']);
+        $this->assertEquals('<label><input type="checkbox" value="a" checked="checked"/> A</label><label><input type="checkbox" value="b"/> B</label>', $data);
     }
 
     public function testSelect()
@@ -178,6 +189,9 @@ class FormTest extends TestCase
         $this->assertEquals('<select id="ID" class="Class"><option value="a">A</option><option value="b" selected="selected">B</option></select>', $data);
     }
 
+    /**
+     * @depends testSelect
+     */
     public function testDropdown()
     {
         $data = Form::dropdown('b', ['id' => 'ID', 'class' => 'Class'], ['a', 'b']);
@@ -189,39 +203,26 @@ class FormTest extends TestCase
         $data = Form::radio();
         $this->assertEquals('', $data);
 
-        echo $data = Form::radio(null, [], ['a', 'b']);
-        //$this->assertEquals('', $data);
+        $data = Form::radio(null, [], ['a', 'b']);
+        $this->assertEquals('<label><input type="radio" value="a"/> a</label><label><input type="radio" value="b"/> b</label>', $data);
 
-        $data = Form::radio('b', [], ['a', 'b', 'c']);
-        //$this->assertEquals('', $data);
+        $data = Form::radio('b', [], ['a', 'b']);
+        $this->assertEquals('<label><input type="radio" value="a"/> a</label><label><input type="radio" value="b" checked="checked"/> b</label>', $data);
 
-        $data = Form::radio('b', ['id' => 'ID', 'class' => 'Class'], ['a', 'b', 'c']);
-        //$this->assertEquals('', $data);s
+        $data = Form::radio('b', ['id' => 'ID', 'class' => 'Class'], ['a' => 'A', 'b' => 'B']);
+        $this->assertEquals('<label><input type="radio" value="a"/> A</label><label><input type="radio" value="b" checked="checked"/> B</label>', $data);
     }
 
     public function testLabel()
     {
         $data = Form::label();
-        //$this->assertEquals('', $data);
+        $this->assertEquals('<label></label>', $data);
 
         $data = Form::label('Some text');
-        //$this->assertEquals('', $data);
+        $this->assertEquals('<label>Some text</label>', $data);
 
         $data = Form::label('Some text', ['id' => 'ID', 'class' => 'Class', 'for' => 'for']);
-        //$this->assertEquals('', $data);
+        $this->assertEquals('<label id="ID" class="Class" for="for">Some text</label>', $data);
     }
-
-    public function testExample()
-    {
-        //$form = new Form;
-        //$attr = ['id' => 'id'];
-        //echo Form::test();
-
-        //echo $form->text('val', ['id' => 'id']);
-        //echo $form->checkbox();
-        //echo $form->label('test', $attr);
-        //echo $form->radio('', [], ['a', 'b']);
-    }
-
 
 }
