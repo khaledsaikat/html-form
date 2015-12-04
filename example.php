@@ -1,6 +1,6 @@
 <?php
 
-require_once "./src/Form.php";
+require __DIR__ . '/vendor/autoload.php';
 
 use UserMeta\Html\Form;
 

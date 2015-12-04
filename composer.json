@@ -1,0 +1,17 @@
+{
+    "name": "khaledsaikat/html-form",
+    "description": "PHP class for html form builder",
+    "license": "GNU",
+    "authors": [
+        {
+            "name": "Khaled Hossain"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": { "UserMeta\\Html\\": "src/" },
+        "files": [ "src/functions.php" ]
+    }
+}

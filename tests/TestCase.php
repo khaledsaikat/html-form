@@ -1,6 +1,9 @@
 <?php
 
-class TestCase extends PHPUnit_Framework_TestCase
+/**
+ * Base abstract class for writing tests
+ */
+abstract class TestCase extends PHPUnit_Framework_TestCase
 {
 
     /**

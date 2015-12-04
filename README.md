@@ -11,7 +11,7 @@ First of all include ```Form.php``` to project and make use of ```use UserMeta\H
 
 ```
 <?php
-require_once "src/Form.php";
+require __DIR__ . '/vendor/autoload.php';
 
 use UserMeta\Html\Form;
 ```
