@@ -55,8 +55,11 @@ class FormTest extends TestCase
         $data = Form::checkbox();
         $this->assertEquals('<input type="checkbox" value="1"/>', $data);
 
-        $data = Form::checkbox('Some default value');
+        $data = Form::checkbox(true);
         $this->assertEquals('<input type="checkbox" value="1" checked="checked"/>', $data);
+
+        $data = Form::checkbox('Some default value');
+        $this->assertEquals('<input type="checkbox" value="1"/>', $data);
 
         $data = Form::checkbox(0, ['id' => 'ID', 'class' => 'Class']);
         $this->assertEquals('<input type="checkbox" value="1" id="ID" class="Class"/>', $data);
@@ -135,7 +138,7 @@ class FormTest extends TestCase
     public function testRadio()
     {
         $data = Form::radio();
-        $this->assertEquals('', $data);
+        $this->assertEquals('<input type="radio" value="1"/>', $data);
 
         $data = Form::radio(null, [], ['a', 'b']);
         $this->assertEquals('<label><input type="radio" value="a"/> a</label><label><input type="radio" value="b"/> b</label>', $data);
@@ -206,7 +209,7 @@ class FormTest extends TestCase
         $this->assertEquals('<input type="text" name="Name"/>', $html);
 
         $html = Form::checkbox(null, ['name' => 'Name']);
-        $this->assertEquals('<input type="checkbox" value="1" name="Name"/>', $html);
+        $this->assertEquals('<input type="checkbox" name="Name" value="1"/>', $html);
 
         $html = Form::select(null, ['name' => 'Name'], ['a', 'b']);
         $this->assertEquals('<select name="Name"><option value="a">a</option><option value="b">b</option></select>', $html);

@@ -3,11 +3,11 @@
 namespace UserMeta\Html;
 
 /*
- * Abstract for options elements
+ * trait for options elements
  *
  * @author Khaled Hossain
  */
-abstract class OptionsElement
+trait OptionsElement
 {
     /**
      * Counting number of options.
@@ -43,7 +43,7 @@ abstract class OptionsElement
 
         $html = $this->addLabel();
 
-        $html .= "<select{$this->attributes()}>{$this->_buildOptions()}</select>";
+        $html .= "<select{$this->attributes()}>{$this->buildOptions()}</select>";
 
         return $html;
     }
@@ -63,7 +63,7 @@ abstract class OptionsElement
 
         $html = $this->addLabel();
 
-        $html .= "<select{$this->attributes()} multiple=\"multiple\">{$this->_buildOptions()}</select>";
+        $html .= "<select{$this->attributes()} multiple=\"multiple\">{$this->buildOptions()}</select>";
 
         return $html;
     }
@@ -77,13 +77,13 @@ abstract class OptionsElement
      *
      * @return string : html radio
      */
-    protected function radio($default = null, array $attributes = [], array $options = [])
+    protected function radioList($default = null, array $attributes = [], array $options = [])
     {
         $this->setProperties('radio', $default, $attributes, $options);
 
         $html = $this->addLabel();
 
-        $html .= $this->_buildOptions();
+        $html .= $this->buildOptions();
 
         return $html;
     }
@@ -103,7 +103,7 @@ abstract class OptionsElement
 
         $html = $this->addLabel();
 
-        $html .= $this->_buildOptions();
+        $html .= $this->buildOptions();
 
         return $html;
     }
@@ -157,7 +157,7 @@ abstract class OptionsElement
             $attributes = $this->_getRefinedAttributes();
         }
 
-        $attributes = array_merge($attributes, $option, $this->_getSelectedAttribute($option));
+        $attributes = array_merge($attributes, $option, $this->getSelectedAttribute($option));
 
         $this->refineOptionsAttributes($attributes);
 
@@ -203,16 +203,12 @@ abstract class OptionsElement
     /**
      * Get selected/checked attribute.
      *
-     * @param array $option: single option contains key 'value'
+     * @param array $option: single option or attributes contains key 'value'
      *
-     * @return array : e.g. ['checked' => 'checked']
+     * @return array : e.g. ['checked' => 'checked'] | []
      */
-    protected function _getSelectedAttribute(array $option)
+    protected function getSelectedAttribute(array $option)
     {
-        if (empty($option['value']) || empty($this->default)) {
-            return [];
-        }
-
         switch ($this->type) {
             case 'select':
             case 'multiselect':
@@ -220,12 +216,22 @@ abstract class OptionsElement
             break;
 
             case 'radio':
+            case 'checkbox':
+            case 'radioList':
             case 'checkboxList':
                 $key = 'checked';
             break;
 
             default:
                 throw new \Exception('selected or checked attribute is not available for '.$this->type);
+        }
+
+        if ($this->default === true) {
+            return [$key => $key];
+        }
+
+        if (empty($option['value']) || empty($this->default)) {
+            return [];
         }
 
         if (is_array($this->default)) {
@@ -242,7 +248,7 @@ abstract class OptionsElement
      *
      * @return string : option html
      */
-    protected function _buildOptions()
+    protected function buildOptions()
     {
         $html = '';
         foreach ($this->options as $option) {

@@ -4,11 +4,15 @@ namespace UserMeta\Html;
 
 /*
  * Class for html form builder.
+ * By default, if provided method is not found,
+ * it will create input field with method as type
  *
  * @author Khaled Hossain
  */
-class Form extends OptionsElement
+class Form
 {
+    use OptionsElement, Element;
+    
     /**
      * Input type.
      */
@@ -29,6 +33,7 @@ class Form extends OptionsElement
      */
     public $options = [];
 
+
     /**
      * Generate text input.
      *
@@ -41,42 +46,54 @@ class Form extends OptionsElement
     {
         return $this->input('text', $default, $attributes);
     }
-
+    
     /**
-     * Generate label.
+     * Generate textarea.
      *
-     * @param string $default:    Text for label
+     * @param string $default:    Inside text for textarea
      * @param array  $attributes: (optional)
      *
-     * @return string : html label
+     * @return string : html textarea
      */
-    protected function label($default = null, array $attributes = [])
+    protected function textarea($default = null, array $attributes = [])
     {
-        $this->setProperties('label', $default, $attributes);
-
-        return "<label{$this->attributes()}>$default</label>";
+         return $this->element('textarea', $default, $attributes);
     }
 
     /**
-     * Generate single checkbox.
+     * Generate a single checkbox or list of checkboxes.
      *
      * @param bool  $default:    true, 1 or any value for checked and false or 0 for unchecked
      * @param array $attributes: (optional)
+     * @param array $options:    Generate list of checkbox when $options is not empty
      *
      * @return string : html checkbox
      */
-    protected function checkbox($default = false, array $attributes = [])
+    protected function checkbox($default = false, array $attributes = [],  array $options = [])
     {
-        $this->setProperties('checkbox', $default, $attributes);
-        $this->_refineInputAttributes();
-
-        $this->attributes['value'] = !empty($attributes['value']) ? $attributes['value'] : '1';
-
-        if ($default) {
-            $this->attributes['checked'] = 'checked';
+        if (!empty($options)) {
+            return $this->checkboxList($default, $attributes, $options);
         }
 
-        return $this->_createInput();
+        return $this->_singleCheckboxRadio('checkbox', $default, $attributes);
+    }
+
+    /**
+     * Generate a single radio or list of radios.
+     *
+     * @param bool  $default:    true, 1 or any value for checked and false or 0 for unchecked
+     * @param array $attributes: (optional)
+     * @param array $options:    Generate list of radios when $options is not empty
+     *
+     * @return string : html checkbox
+     */
+    protected function radio($default = false, array $attributes = [],  array $options = [])
+    {
+        if (!empty($options)) {
+            return $this->radioList($default, $attributes, $options);
+        }
+
+        return $this->_singleCheckboxRadio('radio', $default, $attributes);
     }
 
     /**
@@ -92,6 +109,18 @@ class Form extends OptionsElement
     {
         $this->setProperties($type, $default, $attributes);
         $this->_refineInputAttributes();
+
+        return $this->_createInput();
+    }
+
+    private function _singleCheckboxRadio($type, $default, $attributes)
+    {
+        $this->setProperties($type, $default, $attributes);
+        $this->_refineInputAttributes();
+
+        $this->attributes['value'] = !empty($attributes['value']) ? $attributes['value'] : '1';
+
+        $this->attributes = array_merge($this->attributes, $this->getSelectedAttribute($this->attributes));
 
         return $this->_createInput();
     }
@@ -149,12 +178,14 @@ class Form extends OptionsElement
 
     /**
      * Adding type and value to $this->attributes
-     * Useful for making text fields.
+     * Useful for making input fields.
+     * name attribute was added to keep following order: type, name, value.
      */
     private function _refineInputAttributes()
     {
         $this->attributes = array_merge([
             'type' => $this->type,
+            'name' => null,
             'value' => $this->default,
         ], $this->attributes);
     }
@@ -321,7 +352,20 @@ class Form extends OptionsElement
     }
 
     /**
-     * Call static methods. eg: Form::text('something');.
+     * Get value for given key from an array.
+     */
+    protected function get($key, array $data, $default = null)
+    {
+        if (isset($data[$key])) {
+            return $data[$key];
+        }
+
+        return $default;
+    }
+
+    /**
+     * Call static methods. eg: Form::text('something');
+     * Call default 'input' method if method not found.
      *
      * @param string $method: Method name to call
      * @param array  $args:   Arguments array to pass to invocked method call
@@ -330,9 +374,12 @@ class Form extends OptionsElement
      */
     public static function __callStatic($method, $args)
     {
-        $instance = new self();
-
+        $instance = new static();
         try {
+            if (! method_exists($instance, $method)) {
+                array_unshift($args, $method);
+                $method = 'input';
+            }
             return call_user_func_array([$instance, $method], $args);
         } catch (Exception $e) {
             echo 'Exception: ',  $e->getMessage(), "\n";
