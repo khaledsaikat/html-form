@@ -75,6 +75,21 @@ class Html
     }
 
     /**
+     * Add html to collection
+     *
+     * @param
+     *            Html object | string $html
+     */
+    public function add($html)
+    {
+        try {
+            $this->default .= is_object($html) ? $html->render() : $html;
+        } catch (Exception $e) {
+            echo 'Exception: ', $e->getMessage(), "\n";
+        }
+    }
+
+    /**
      * render collection elements
      *
      * @return string html
