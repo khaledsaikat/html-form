@@ -6,6 +6,7 @@ namespace UserMeta\Html;
  * trait for options elements
  *
  * @author Khaled Hossain
+ * @since 1.0.0
  */
 trait OptionsElement
 {

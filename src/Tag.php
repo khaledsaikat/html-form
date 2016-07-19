@@ -6,8 +6,9 @@ namespace UserMeta\Html;
  * trait for html elements
  *
  * @author Khaled Hossain
+ * @since 1.0.0
  */
-trait Element
+trait Tag
 {
     /**
      * Generate label.

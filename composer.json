@@ -16,6 +16,6 @@
         "psr-4": {
             "UserMeta\\Html\\": "src/"
         },
-        "files": ["src/functions.php"]
+        "files": ["src/wp.php"]
     }
 }

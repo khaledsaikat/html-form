@@ -1,8 +1,7 @@
 <?php
+namespace UserMeta\Html;
 
-use UserMeta\Html\Form;
-
-class UtilsTest extends TestCase
+class UtilsTest extends \TestCase
 {
     private $dummyArray = ['id' => 'ID', 'class' => 'Class'];
 
@@ -31,7 +30,7 @@ class UtilsTest extends TestCase
         $data = $this->invokeMethod($this->form, 'isString', [[]]);
         $this->assertFalse($data);
 
-        $data = $this->invokeMethod($this->form, 'isString', [new stdClass()]);
+        $data = $this->invokeMethod($this->form, 'isString', [new \stdClass()]);
         $this->assertFalse($data);
     }
 
