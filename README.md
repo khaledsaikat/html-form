@@ -140,7 +140,20 @@ Output:
 #### Using label
 
 ```php
-echo Html::email(null, ['name' => 'Example_Name', 'label' => 'Email']);
+echo Html::email(null, [
+    'name' => 'Example_Name',
+    'label' => 'Email'
+]);
+```
+
+```php
+echo Html::email(null, [
+    'name' => 'Example_Name',
+    'label' => [
+        'Example',
+        'class' => 'Class'
+    ]
+]);
 ```
 
 Output:
@@ -149,12 +162,6 @@ Output:
 <label>Email</label>
 <input type="email" name="Example_Name"/>
 ```
-
-```php
-echo Html::email(null, ['name' => 'Example_Name', 'label' => ['Example', 'class' => 'Class']]);
-```
-
-Output:
 
 ```html
 <label class="Class">Example</label>
