@@ -85,7 +85,7 @@ trait Tag
     {
         $this->setProperties($type, '', $attributes);
         
-        return "<{$type}{$this->attributes()} />";
+        return "<{$type}{$this->attributes()}/>";
     }
 
     /**

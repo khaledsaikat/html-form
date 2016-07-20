@@ -121,6 +121,22 @@ Output:
 <input type="text" name="Example_Name" value="Example_Value" data-example="Example_Data"/>
 ```
 
+#### using required, readonly and disabled
+
+```php
+echo Html::email(null, ['name' => 'Email', 'required']);
+echo Html::email(null, ['name' => 'Email', 'readonly']);
+echo Html::email(null, ['name' => 'Email', 'disabled']);
+```
+
+Output:
+
+```html
+<input type="email" name="Email" required="required"/>
+<input type="email" name="Email" readonly="readonly"/>
+<input type="email" name="Email" disabled="disabled"/>
+```
+
 #### Using label with input:
 
 ```php
@@ -253,7 +269,6 @@ Collection uses `Html` constructor and accept three parameter.
 - `$type` (optional): name of tag. (e.g. form, div)
 - `$attributes` (optional): array of attributes
 - `$default` (optional): default value
-$type = null, array $attributes = [], $default = null
 
 #### Form example
 
@@ -265,6 +280,7 @@ $form->div('Enter your email and password for login');
 $form->email('', ['name' => 'email', 'label' => 'Email']);
 $form->password('', ['name' => 'password', 'label' => 'Password']);
 $form->submit('login');
+$form->add('Some plain text');
 echo $form->render();
 ```
 
@@ -278,6 +294,7 @@ Output:
     <label>Password</label>
     <input type="password" name="password"/>
     <input type="submit" value="login"/>
+    Some plain text
 </form>
 ```
 
@@ -287,12 +304,10 @@ Generating html template using nested collections:
 
 ```php
 $html = new Html('html');
-$head = new Html('head');
+$head = $html->import('head');
 $head->title('Example Title');
-$html->add($head);
-$body = new Html('body');
+$body = $html->import('body');
 $body->p('Hello World');
-$html->add($body);
 echo $html->render();
 ```
 
@@ -305,6 +320,29 @@ echo $html->render();
         <p>Hello World</p>
     </body>
 </html>
+```
+
+#### Using as xml generator
+
+```php
+$book = new Html('book');
+$book->title('The Da Vinci Code');
+$author = $book->import('author');
+$author->name('Dan Brown');
+$author->nationality('American');
+echo $book->render();
+```
+
+Output
+
+```xml
+<book>
+    <title>The Da Vinci Code</title>
+    <author>
+        <name>Dan Brown</name>
+        <nationality>American</nationality>
+    </author>
+</book>
 ```
 
 ## More Examples

@@ -13,6 +13,14 @@ class BasicTest extends \TestCase
         $this->assertEquals('<input type="button"/>', $data);
     }
 
+    public function testRequired()
+    {
+        $data = Html::email('', [
+            'required'
+        ]);
+        $this->assertEquals('<input type="email" required="required"/>', $data);
+    }
+
     /**
      * Test non-existing div method as tag
      */
@@ -28,7 +36,7 @@ class BasicTest extends \TestCase
             'name' => 'keywords',
             'content' => 'Example'
         ]);
-        $this->assertEquals('<meta name="keywords" content="Example" />', $data);
+        $this->assertEquals('<meta name="keywords" content="Example"/>', $data);
     }
 
     public function testImg()
@@ -36,7 +44,7 @@ class BasicTest extends \TestCase
         $data = Html::meta([
             'src' => 'image.png'
         ]);
-        $this->assertEquals('<meta src="image.png" />', $data);
+        $this->assertEquals('<meta src="image.png"/>', $data);
     }
 
     public function testLink()
@@ -46,23 +54,23 @@ class BasicTest extends \TestCase
             'type' => 'text/css',
             'href' => 'style.css'
         ]);
-        $this->assertEquals('<meta rel="stylesheet" type="text/css" href="style.css" />', $data);
+        $this->assertEquals('<meta rel="stylesheet" type="text/css" href="style.css"/>', $data);
     }
 
     public function testCollection()
     {
         $html = new Html('form');
         $html->text();
+        $html->add('Hello');
         $data = $html->render();
-        $this->assertEquals('<form><input type="text"/></form>', $data);
+        $this->assertEquals('<form><input type="text"/>Hello</form>', $data);
     }
 
     public function testNestedCollection()
     {
         $html = new Html('html');
-        $head = new Html('head');
+        $head = $html->import('head');
         $head->title('Example');
-        $html->add($head);
         $data = $html->render();
         $this->assertEquals('<html><head><title>Example</title></head></html>', $data);
     }

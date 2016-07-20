@@ -67,11 +67,25 @@ class Html
      * @param string $type            
      * @param array $attributes            
      */
-    public function __construct($type = null, array $attributes = [], $default = null)
+    public function __construct($type = null, array $attributes = [])
     {
         $this->type = $type;
         $this->attributes = $attributes;
-        $this->default = $default;
+        $this->default = [];
+    }
+
+    /**
+     * Include collection into existing element
+     *
+     * @param string $type            
+     * @param array $attributes            
+     * @return \UserMeta\Html\Html
+     */
+    public function import($type = null, array $attributes = [])
+    {
+        $instance = new static($type, $attributes);
+        $this->default[] = $instance;
+        return $instance;
     }
 
     /**
@@ -83,7 +97,7 @@ class Html
     public function add($html)
     {
         try {
-            $this->default .= is_object($html) ? $html->render() : $html;
+            $this->default[] = is_object($html) ? $html->render() : $html;
         } catch (Exception $e) {
             echo 'Exception: ', $e->getMessage(), "\n";
         }
@@ -97,8 +111,16 @@ class Html
     public function render()
     {
         $type = $this->type ?: '';
+        $html = null;
+        foreach ($this->default as $element) {
+            if ($this->isString($element)) {
+                $html .= $element;
+            } elseif ($element instanceof Html) {
+                $html .= $element->render();
+            }
+        }
         
-        return $type ? static::$type($this->default, $this->attributes) : $this->default;
+        return $type ? static::$type($html, $this->attributes) : $html;
     }
 
     /**
@@ -256,8 +278,21 @@ class Html
         $this->type = $type ?: 'text';
         $this->default = $default;
         $this->attributes = $attributes;
+        $this->_refineAttribute();
         
         $this->setOptions($options);
+    }
+
+    private function _refineAttribute()
+    {
+        $attributes = [];
+        foreach ($this->attributes as $key => $val) {
+            if (is_int($key) && ! empty($val)) {
+                $key = $val;
+            }
+            $attributes[$key] = $val;
+        }
+        $this->attributes = $attributes;
     }
 
     /**
@@ -513,7 +548,7 @@ class Html
     {
         $html = static::_build($method, $args);
         if ($html)
-            $this->default .= $html;
+            $this->default[] = $html;
         
         return $html;
     }
