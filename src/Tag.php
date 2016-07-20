@@ -85,7 +85,7 @@ trait Tag
     {
         $this->setProperties($type, '', $attributes);
         
-        return "<{$type}{$this->attributes()}/>";
+        return $this->_publish("<{$type}{$this->attributes()}/>");
     }
 
     /**
@@ -104,6 +104,6 @@ trait Tag
     {
         $this->setProperties($type, $default, $attributes);
         
-        return "<{$type}{$this->attributes()}>$default</$type>";
+        return $this->_publish("<{$type}{$this->attributes()}>$default</$type>");
     }
 }

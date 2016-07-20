@@ -137,7 +137,7 @@ Output:
 <input type="email" name="Email" disabled="disabled"/>
 ```
 
-#### Using label with input:
+#### Using label
 
 ```php
 echo Html::email(null, ['name' => 'Example_Name', 'label' => 'Email']);
@@ -147,6 +147,17 @@ Output:
 
 ```html
 <label>Email</label>
+<input type="email" name="Example_Name"/>
+```
+
+```php
+echo Html::email(null, ['name' => 'Example_Name', 'label' => ['Example', 'class' => 'Class']]);
+```
+
+Output:
+
+```html
+<label class="Class">Example</label>
 <input type="email" name="Example_Name"/>
 ```
 
@@ -363,4 +374,34 @@ Create h1 by using `tag` method:
 
 ```php
 echo Html::tag('h1', 'Example Heading');
+```
+
+### Add html to before and after elements
+
+```php
+echo Html::email('', ['_before' => 'Before', '_after' => 'After']);
+```
+
+Output
+
+```html
+Before<input type="email"/>After
+```
+
+### Enclose with another element.
+
+```php
+echo Html::email('', ['_enclose' => 'div']);
+echo Html::email('', ['_enclose' => ['div', 'class' => 'Class']]);
+```
+
+Output
+
+```html
+<div>
+    <input type="email"/>
+</div>
+<div class="Class">
+    <input type="email"/>
+</div>
 ```

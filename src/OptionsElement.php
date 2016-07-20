@@ -46,7 +46,7 @@ trait OptionsElement
 
         $html .= "<select{$this->attributes()}>{$this->buildOptions()}</select>";
 
-        return $html;
+        return $this->_publish($html);
     }
 
     /**
@@ -66,7 +66,7 @@ trait OptionsElement
 
         $html .= "<select{$this->attributes()} multiple=\"multiple\">{$this->buildOptions()}</select>";
 
-        return $html;
+        return $this->_publish($html);
     }
 
     /**
@@ -287,7 +287,7 @@ trait OptionsElement
     protected function _buildSingleOption(array $option)
     {
         $option = $this->addKeys($option, ['value', 'label']);
-        $optionRefined = $this->removeKeys($option, ['option_before', 'option_after']);
+        $optionRefined = $this->removeKeys($option, ['_option_before', '_option_after']);
 
         return $this->_optionEnclose($option, 'before')
             .$this->callMethod('Single', $optionRefined)
@@ -304,10 +304,10 @@ trait OptionsElement
      */
     protected function _optionEnclose(array $option, $key = 'before')
     {
-        if (isset($option["option_$key"])) {
-            return $option["option_$key"];
-        } elseif (isset($this->attributes["option_$key"])) {
-            return $this->attributes["option_$key"];
+        if (isset($option["_option_$key"])) {
+            return $option["_option_$key"];
+        } elseif (isset($this->attributes["_option_$key"])) {
+            return $this->attributes["_option_$key"];
         }
 
         return '';

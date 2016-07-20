@@ -21,6 +21,31 @@ class BasicTest extends \TestCase
         $this->assertEquals('<input type="email" required="required"/>', $data);
     }
 
+    public function testBeforeAfterEnclose()
+    {
+        $data = Html::email('', [
+            '_before' => 'Before',
+            '_after' => 'After',
+            '_enclose' => [
+                'div',
+                'class' => 'Class'
+            ]
+        ]);
+        $this->assertEquals('<div class="Class">Before<input type="email"/>After</div>', $data);
+    }
+
+    public function testLabelArray()
+    {
+        $data = Html::email('', [
+            'id' => 'email',
+            'label' => [
+                'Label',
+                'id' => 'label'
+            ]
+        ]);
+        $this->assertEquals('<label id="label" for="email">Label</label><input type="email" id="email"/>', $data);
+    }
+
     /**
      * Test non-existing div method as tag
      */

@@ -413,16 +413,16 @@ class HtmlTest extends \TestCase
     public function testOptionsElementBeforeAfter()
     {
         $html = Form::radio(null, [
-            'option_before' => 'B',
-            'option_after' => 'A'
+            '_option_before' => 'B',
+            '_option_after' => 'A'
         ], [
             'a'
         ]);
         $this->assertEquals('B<label><input type="radio" value="a"/> a</label>A', $html);
         
         $html = Form::checkboxList(null, [
-            'option_before' => 'B',
-            'option_after' => 'A'
+            '_option_before' => 'B',
+            '_option_after' => 'A'
         ], [
             'a'
         ]);
@@ -430,7 +430,7 @@ class HtmlTest extends \TestCase
         
         $html = Form::radio(null, [], [
             [
-                'option_before' => 'B',
+                '_option_before' => 'B',
                 'value' => 'Value',
                 'label' => 'Label'
             ]
@@ -439,7 +439,7 @@ class HtmlTest extends \TestCase
         
         $html = Form::checkboxList(null, [], [
             [
-                'option_after' => 'A',
+                '_option_after' => 'A',
                 'value' => 'Value',
                 'label' => 'Label'
             ]

@@ -234,33 +234,94 @@ class Html
     private function _createInput()
     {
         $html = $this->addLabel();
-        
         $html .= '<input' . $this->attributes() . '/>';
+        
+        return $this->_publish($html);
+    }
+
+    /**
+     * Every generated element should call this function before returning final output
+     *
+     * @param string $element            
+     * @return string
+     */
+    private function _publish($element)
+    {
+        return $this->_refinePublish($element);
+    }
+
+    /**
+     * Refine html before publish
+     *
+     * @param string $element            
+     * @return string
+     */
+    private function _refinePublish($element)
+    {
+        $html = '';
+        if (! empty($this->attributes['_before']))
+            $html .= $this->attributes['_before'];
+        
+        $html .= $element;
+        
+        if (! empty($this->attributes['_after']))
+            $html .= $this->attributes['_after'];
+        
+        if (! empty($this->attributes['_enclose'])) {
+            list ($type, $attr) = $this->_extractDefaultAndAttributes($this->attributes['_enclose']);
+            $html = $this->tag($type, $html, $attr);
+        }
         
         return $html;
     }
 
     /**
      * Adding label to element.
+     * label attribute can be string or array.
+     * In case of array, non-key first value will treat as $default
      *
      * @return string html
      */
-    protected function addLabel()
+    private function addLabel()
     {
         if (isset($this->attributes['label'])) {
-            $for = '';
+            list ($default, $attr) = $this->_extractDefaultAndAttributes($this->attributes['label']);
             
             if (isset($this->attributes['id']) && ! in_array($this->type, [
                 'radio',
                 'checkboxList'
             ])) {
-                $for = " for=\"{$this->attributes['id']}\"";
+                $attr['for'] = $this->attributes['id'];
             }
             
-            return "<label$for>{$this->attributes['label']}</label>";
+            return static::label($default, $attr);
         }
         
-        return '';
+        return null;
+    }
+
+    /**
+     * Extract $default and $attributes from given argument.
+     * In case of string, default=$attr
+     * In case of array, default=$attr[0], $attr=rest of $attr
+     *
+     * @param string|array $attr            
+     * @return array list($default, $attr)
+     */
+    private function _extractDefaultAndAttributes($attr)
+    {
+        if (is_array($attr)) {
+            $default = isset($attr[0]) ? $attr[0] : null;
+            unset($attr[0]);
+        } else {
+            $default = $attr;
+            $attr = [];
+        }
+        
+        return [
+            $default,
+            $attr
+        ];
     }
 
     /**
@@ -273,7 +334,7 @@ class Html
      * @param array $attributes            
      * @param array $options            
      */
-    protected function setProperties($type, $default, array $attributes, array $options = [])
+    private function setProperties($type, $default, array $attributes, array $options = [])
     {
         $this->type = $type ?: 'text';
         $this->default = $default;
@@ -314,7 +375,7 @@ class Html
      *
      * @return string: Attributes string
      */
-    protected function attributes()
+    private function attributes()
     {
         $attributes = $this->_getRefinedAttributes();
         
@@ -326,15 +387,18 @@ class Html
      *
      * @return array: $attributes
      */
-    protected function _getRefinedAttributes()
+    private function _getRefinedAttributes()
     {
         $attributes = $this->attributes;
         $attributes = $this->onlyNonEmpty($attributes);
         $attributes = $this->onlyString($attributes);
         $attributes = $this->removeKeys($attributes, [
             'label',
-            'option_before',
-            'option_after'
+            '_before',
+            '_after',
+            '_enclose',
+            '_option_before',
+            '_option_after'
         ]);
         
         if (! empty($attributes['value'])) {
@@ -351,7 +415,7 @@ class Html
      *
      * @return string: Attributes string
      */
-    protected function toString(array $attributes)
+    private function toString(array $attributes)
     {
         $string = '';
         
@@ -371,7 +435,7 @@ class Html
      *
      * @return mixed: htmlspecialchars filtered data
      */
-    protected function filter($data)
+    private function filter($data)
     {
         if (is_array($data)) {
             return array_map('\\esc_attr', $data);
@@ -394,7 +458,7 @@ class Html
      *            
      * @return array
      */
-    protected function addKeys(array $data, array $keys, $default = '')
+    private function addKeys(array $data, array $keys, $default = '')
     {
         foreach ($keys as $key) {
             if (! isset($data[$key])) {
@@ -415,7 +479,7 @@ class Html
      *            
      * @return array
      */
-    protected function removeKeys(array $data, array $keys)
+    private function removeKeys(array $data, array $keys)
     {
         foreach ($data as $key => $itm) {
             if (in_array($key, $keys)) {
@@ -433,7 +497,7 @@ class Html
      *
      * @return array
      */
-    protected function onlyString(array $data)
+    private function onlyString(array $data)
     {
         foreach ($data as $key => $itm) {
             if (! $this->isString($itm)) {
@@ -451,7 +515,7 @@ class Html
      *
      * @return array
      */
-    protected function onlyNonEmpty(array $data)
+    private function onlyNonEmpty(array $data)
     {
         foreach ($data as $key => $itm) {
             if (empty($itm)) {
@@ -469,7 +533,7 @@ class Html
      *
      * @return bool
      */
-    protected function isString($data)
+    private function isString($data)
     {
         if (in_array(gettype($data), [
             'array',
@@ -484,7 +548,7 @@ class Html
     /**
      * Get value for given key from an array.
      */
-    protected function get($key, array $data, $default = null)
+    private function get($key, array $data, $default = null)
     {
         if (isset($data[$key])) {
             return $data[$key];
@@ -529,7 +593,7 @@ class Html
                 $method
             ], $args);
         } catch (Exception $e) {
-            echo 'Exception: ', $e->getMessage(), "\n";
+            return 'Exception: ' . $e->getMessage() . "\n";
         }
     }
 
