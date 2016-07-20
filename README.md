@@ -58,7 +58,7 @@ Output:
 <input type="text" value="example"/>
 ```
 
-Almost all types of html element can be used. (e.g: buttom, email, div, p etc)
+Almost all types of html element can be used. (e.g: button, email, div, p etc)
 
 ```php
 echo Html::button('Submit Me');
@@ -76,14 +76,22 @@ Output:
 <p>example text</p>
 ```
 
-## Basic Usage
+## Usage
 
-Most of the element accept two arguments:
+### Basic Usage
+
+Accepted arguments:
+- Most of the element accept two arguments:
 - `$default`: Default value
 - `$attributes`: Array of attributes
 - `echo Html::text($default, attributes);`
 
-### using name, id and class
+- For options element like select, radio, it accept third argument as `$options`
+- `$options`: Array of options.
+- `echo Html::select($default, attributes, $options);`
+
+#### using name, id and class
+
 To assign name, id, class or any other attributes, use second arguments (`$attributes`)
 
 A text field with default value, name, id and class attributes:
@@ -98,7 +106,9 @@ Output:
 <input type="text" name="Example_Name" value="Example_Value" id="Example_ID" class="Example_Class"/>
 ```
 
-You can also add any attributes into any fields:
+#### Add attributes to element
+
+You can also add any attributes into any element:
 
 ```php
 echo Html::text('Example_Value', ['name' => 'Example_Name', 'data-example' => 'Example_Data']);
@@ -110,7 +120,7 @@ Output:
 <input type="text" name="Example_Name" value="Example_Value" data-example="Example_Data"/>
 ```
 
-Using label with input:
+#### Using label with input:
 
 ```php
 echo Html::email(null, ['name' => 'Example_Name', 'label' => 'Email']);
@@ -123,7 +133,7 @@ Output:
 <input type="email" name="Example_Name"/>
 ```
 
-A div  with id and class attributes:
+#### A div  with id and class attributes:
 
 ```php
 echo Html::div('example text', ['id' => 'Example_ID', 'class' => 'Example_Class']);
@@ -133,6 +143,87 @@ Output:
 
 ```html
 <div id="Example_ID" class="Example_Class">example text</div>
+```
+
+#### lebel with label text, id, class and for attributes
+
+```php
+echo Html::label('Some text', ['id' => 'ID', 'class' => 'Class', 'for' => 'For']);
+```
+
+Output:
+
+```html
+<label id="ID" class="Class" for="For">Some text</label>
+```
+
+### Using checkbox
+
+#### Simple checkbox with default checked
+
+```php
+echo Html::checkbox(true, ['name' => 'Name']);
+echo Html::checkbox(true, ['name' => 'Name', 'value' => 'Value']);
+```
+
+Output:
+
+```html
+<input type="checkbox" name="Name" value="1" checked="checked"/>
+<input type="checkbox" name="Name" value="Value" checked="checked"/>
+```
+
+Pass first argument as false for default unchecked. `echo Html::checkbox(false)`
+
+#### List of checkbox
+
+Create a list of checkboxes with default values
+
+```php
+echo Html::checkboxList(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
+```
+
+Output
+
+```html
+<label><input type="checkbox" value="dog" name="Name[]" id="ID_1"/> Dog</label>
+<label><input type="checkbox" value="cat" name="Name[]" id="ID_2" checked="checked"/> Cat</label>
+```
+
+### Using select / radio
+
+#### Create a select with default value, name and id attributes
+
+```php
+echo Html::select(['cat'], ['name' => 'Name'], ['dog' => 'Dog', 'cat' => 'Cat']);
+echo Html::select(['cat'], ['name' => 'Name'], ['dog', 'cat']);
+```
+
+Output
+
+```html
+<select name="Name">
+    <option value="dog">Dog</option>
+    <option value="cat" selected="selected">Cat</option>
+</select>
+
+<select name="Name">
+    <option value="dog">dog</option>
+    <option value="cat" selected="selected">cat</option>
+</select>
+```
+
+#### Create a list of radio
+
+```php
+echo Html::radio(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog', 'cat']);
+```
+
+Output
+
+```html
+<label><input type="radio" value="dog" name="Name" id="ID_1"/> dog</label>
+<label><input type="radio" value="cat" name="Name" id="ID_2" checked="checked"/> cat</label>
 ```
 
 ### Using collection
@@ -175,8 +266,10 @@ Output:
 ```html
 <form method="POST">
     <div>Enter your email and password for login</div>
-    <label>Email</label><input type="email" name="email"/>
-    <label>Password</label><input type="password" name="password"/>
+    <label>Email</label>
+    <input type="email" name="email"/>
+    <label>Password</label>
+    <input type="password" name="password"/>
     <input type="submit" value="login"/>
 </form>
 ```
@@ -221,34 +314,4 @@ Create h1 by using `tag` method:
 
 ```php
 echo Html::tag('h1', 'Example Heading');
-```
-
-Create a checkbox with default checked and with name and id attributes
-```php
-echo Html::checkbox(true, ['name' => 'Name', 'id' => 'ID']);
-```
-
-Create a list of checkboxes with default values
-```php
-echo Html::checkboxList(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
-```
-
-Create a select with default value, name and id attributes
-```php
-echo Html::select(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
-```
-
-Alies select
-```php
-echo Html::dropdown(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
-```
-
-Create a list of radio
-```php
-echo Html::radio(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
-```
-
-Create a lebel with label text, id, class and for attributes
-```php
-echo Html::label('Some text', ['id' => 'ID', 'class' => 'Class', 'for' => 'for']);
 ```
