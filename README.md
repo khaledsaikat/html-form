@@ -265,10 +265,9 @@ Output:
 </div>
 ```
 
-Collection uses `Html` constructor and accept three parameter.
+Collection uses `Html` constructor and accept two parameters.
 - `$type` (optional): name of tag. (e.g. form, div)
 - `$attributes` (optional): array of attributes
-- `$default` (optional): default value
 
 #### Form example
 
@@ -280,7 +279,6 @@ $form->div('Enter your email and password for login');
 $form->email('', ['name' => 'email', 'label' => 'Email']);
 $form->password('', ['name' => 'password', 'label' => 'Password']);
 $form->submit('login');
-$form->add('Some plain text');
 echo $form->render();
 ```
 
@@ -294,7 +292,6 @@ Output:
     <label>Password</label>
     <input type="password" name="password"/>
     <input type="submit" value="login"/>
-    Some plain text
 </form>
 ```
 
