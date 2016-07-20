@@ -67,11 +67,11 @@ class Html
      * @param string $type            
      * @param array $attributes            
      */
-    public function __construct($type = null, array $attributes = [])
+    public function __construct($type = null, array $attributes = [], $default = null)
     {
         $this->type = $type;
         $this->attributes = $attributes;
-        $this->default = '';
+        $this->default = $default;
     }
 
     /**

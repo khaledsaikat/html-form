@@ -80,14 +80,15 @@ Output:
 
 ### Basic Usage
 
-Accepted arguments:
-- Most of the element accept two arguments:
-- `$default`: Default value
-- `$attributes`: Array of attributes
+#### Accepted arguments
+
+Most of the element accept two arguments:
+- `$default` : Default value
+- `$attributes` : Array of attributes
 - `echo Html::text($default, attributes);`
 
-- For options element like select, radio, it accept third argument as `$options`
-- `$options`: Array of options.
+For options element like select, radio, it accept third argument as `$options`
+- `$options`: Array of options. The array can contains key-value pair or only values
 - `echo Html::select($default, attributes, $options);`
 
 #### using name, id and class
@@ -248,6 +249,12 @@ Output:
 </div>
 ```
 
+Collection uses `Html` constructor and accept three parameter.
+- `$type` (optional): name of tag. (e.g. form, div)
+- `$attributes` (optional): array of attributes
+- `$default` (optional): default value
+$type = null, array $attributes = [], $default = null
+
 #### Form example
 
 Generating a form using collections:
@@ -302,7 +309,14 @@ echo $html->render();
 
 ## More Examples
 
-Although it is possible to create any element by calling their name. But under the hood, we use `Html::input()` for input element and `Html::tag()` for html tag
+Although it is possible to create any element by calling their name.
+
+```php
+echo Html::email('noreply@gmail.com');
+echo Html::h1('Example Heading');
+```
+
+But under the hood, we use `Html::input()` for input element and `Html::tag()` for html tag
 
 Create an email input by using `input` method:
 
