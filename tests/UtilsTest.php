@@ -104,7 +104,7 @@ class UtilsTest extends \TestCase
 
     public function testSetOptionsWithDirectPass()
     {
-        $options = [['value' => 'value1', 'label' => 'Label1'], ['value2' => 'value2', 'label2' => 'Label2']];
+        $options = [['value' => 'value1', 'label' => 'Label1'], ['value' => 'value2', 'label' => 'Label2']];
         $this->invokeMethod($this->form, 'setOptions', [$options]);
         $data = $this->getProperty($this->form, 'options');
 
@@ -122,5 +122,13 @@ class UtilsTest extends \TestCase
         $this->assertEquals('email', $this->form->type);
         $this->assertEquals('noreply@email.com', $this->form->default);
         $this->assertEquals(['id' => 'ID', 'class' => 'Class'], $this->form->attributes);
+    }
+    
+    function testIsIntegerKeys()
+    {
+        $data = $this->invokeMethod($this->form, '_isIntegerKeys', [['a']]);
+        $this->assertTrue($data);
+        $data = $this->invokeMethod($this->form, '_isIntegerKeys', [['a','b'=>'B']]);
+        $this->assertFalse($data);
     }
 }

@@ -268,7 +268,7 @@ class Html
             $html .= $this->attributes['_after'];
         
         if (! empty($this->attributes['_enclose'])) {
-            list ($type, $attr) = $this->_extractDefaultAndAttributes($this->attributes['_enclose']);
+            list ($type, $attr) = $this->_splitFirstFromArray($this->attributes['_enclose']);
             $html = $this->tag($type, $html, $attr);
         }
         
@@ -285,7 +285,7 @@ class Html
     private function addLabel()
     {
         if (isset($this->attributes['label'])) {
-            list ($default, $attr) = $this->_extractDefaultAndAttributes($this->attributes['label']);
+            list ($default, $attr) = $this->_splitFirstFromArray($this->attributes['label']);
             
             if (isset($this->attributes['id']) && ! in_array($this->type, [
                 'radio',
@@ -301,26 +301,26 @@ class Html
     }
 
     /**
-     * Extract $default and $attributes from given argument.
-     * In case of string, default=$attr
-     * In case of array, default=$attr[0], $attr=rest of $attr
+     * Split first element from given array
+     * In case of string, first=$args
+     * In case of array, $first=$args[0], $args=rest of $args
      *
-     * @param string|array $attr            
-     * @return array list($default, $attr)
+     * @param string|array $args            
+     * @return array list($first, $args)
      */
-    private function _extractDefaultAndAttributes($attr)
+    private function _splitFirstFromArray($args)
     {
-        if (is_array($attr)) {
-            $default = isset($attr[0]) ? $attr[0] : null;
-            unset($attr[0]);
+        if (is_array($args)) {
+            $first = isset($args[0]) ? $args[0] : null;
+            unset($args[0]);
         } else {
-            $default = $attr;
-            $attr = [];
+            $first = $args;
+            $args = [];
         }
         
         return [
-            $default,
-            $attr
+            $first,
+            $args
         ];
     }
 

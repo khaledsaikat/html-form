@@ -13,39 +13,6 @@ class BasicTest extends \TestCase
         $this->assertEquals('<input type="button"/>', $data);
     }
 
-    public function testRequired()
-    {
-        $data = Html::email('', [
-            'required'
-        ]);
-        $this->assertEquals('<input type="email" required="required"/>', $data);
-    }
-
-    public function testBeforeAfterEnclose()
-    {
-        $data = Html::email('', [
-            '_before' => 'Before',
-            '_after' => 'After',
-            '_enclose' => [
-                'div',
-                'class' => 'Class'
-            ]
-        ]);
-        $this->assertEquals('<div class="Class">Before<input type="email"/>After</div>', $data);
-    }
-
-    public function testLabelArray()
-    {
-        $data = Html::email('', [
-            'id' => 'email',
-            'label' => [
-                'Label',
-                'id' => 'label'
-            ]
-        ]);
-        $this->assertEquals('<label id="label" for="email">Label</label><input type="email" id="email"/>', $data);
-    }
-
     /**
      * Test non-existing div method as tag
      */
@@ -80,6 +47,57 @@ class BasicTest extends \TestCase
             'href' => 'style.css'
         ]);
         $this->assertEquals('<meta rel="stylesheet" type="text/css" href="style.css"/>', $data);
+    }
+
+    public function testRequired()
+    {
+        $data = Html::email('', [
+            'required'
+        ]);
+        $this->assertEquals('<input type="email" required="required"/>', $data);
+    }
+
+    public function testBeforeAfterEnclose()
+    {
+        $data = Html::email('', [
+            '_before' => 'Before',
+            '_after' => 'After',
+            '_enclose' => [
+                'div',
+                'class' => 'Class'
+            ]
+        ]);
+        $this->assertEquals('<div class="Class">Before<input type="email"/>After</div>', $data);
+    }
+
+    public function testLabelArray()
+    {
+        $data = Html::email('', [
+            'id' => 'email',
+            'label' => [
+                'Label',
+                'id' => 'label'
+            ]
+        ]);
+        $this->assertEquals('<label id="label" for="email">Label</label><input type="email" id="email"/>', $data);
+    }
+
+    public function testBasicOptions()
+    {
+        $data = Html::select(null, [], [
+            'a',
+            'b' => 'B',
+            'c' => [
+                'C',
+                'data' => 'DataC'
+            ],
+            [
+                'value' => 'd',
+                'label' => 'D',
+                'data' => 'DataD'
+            ]
+        ]);
+        $this->assertEquals('<select><option value="a">a</option><option value="b">B</option><option value="c" data="DataC">C</option><option value="d" data="DataD">D</option></select>', $data);
     }
 
     public function testCollection()

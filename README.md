@@ -215,7 +215,7 @@ Pass first argument as false for default unchecked. `echo Html::checkbox(false)`
 Create a list of checkboxes with default values
 
 ```php
-echo Html::checkboxList(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
+echo Html::checkbox(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
 ```
 
 Output
@@ -360,7 +360,7 @@ Output
 </book>
 ```
 
-## More Examples
+## Advanced
 
 Although it is possible to create any element by calling their name.
 
@@ -411,4 +411,70 @@ Output
 <div class="Class">
     <input type="email"/>
 </div>
+```
+
+### several way to set options for select / multiselect / radio / checkbox
+
+```php
+// Same value and label
+echo Html::select(null, [], ['audi', 'bmw']);
+
+// Different value and label
+echo Html::select(null, [], ['audi' => 'Audi', 'bmw' => 'BMW']);
+
+// Option with extra attributes
+echo Html::select(null, [], ['ferrari' => ['Ferrari', 'data-origin' => 'Italy']]);
+echo Html::select(null, [], [['value' => 'ferrari', 'label' => 'Ferrari', 'data-origin' => 'Italy']]);
+```
+
+Output
+
+```html
+<select><option value="audi">audi</option><option value="bmw">bmw</option></select>
+<select><option value="audi">Audi</option><option value="bmw">BMW</option></select>
+<select><option value="ferrari" data-origin="Italy">Ferrari</option></select>
+<select><option value="ferrari" data-origin="Italy">Ferrari</option></select>
+```
+
+Mixing several way with one options array
+
+```php
+echo Html::select(null, [], [
+    'audi',
+    'bmw' => 'BMW',
+    'honda' => [
+        'Honda',
+        'data-origin' => 'Japan'
+    ],
+    [
+        'value' => 'ferrari',
+        'label' => 'Ferrari',
+        'data-origin' => 'Italy'
+    ]
+]);
+```
+
+Output
+
+```html
+<select>
+    <option value="audi">audi</option>
+    <option value="bmw">BMW</option>
+    <option value="honda" data-origin="Japan">Honda</option>
+    <option value="ferrari" data-origin="Italy">Ferrari</option>
+</select>
+```
+
+Using numeric value
+
+```php
+echo Html::select(null, [], [2 => 'Two', 4 => 'Four']);
+```
+Output
+
+```html
+<select>
+    <option value="2">Two</option>
+    <option value="4">Four</option>
+</select>
 ```

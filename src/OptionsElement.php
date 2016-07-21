@@ -1,5 +1,4 @@
 <?php
-
 namespace UserMeta\Html;
 
 /*
@@ -10,6 +9,7 @@ namespace UserMeta\Html;
  */
 trait OptionsElement
 {
+
     /**
      * Counting number of options.
      */
@@ -18,10 +18,12 @@ trait OptionsElement
     /**
      * Alias of select method.
      *
-     * @param string $default:   Default selected value
-     * @param array  $attributes
-     * @param array  $options:   Dropdown options
-     *
+     * @param string $default:
+     *            Default selected value
+     * @param array $attributes            
+     * @param array $options:
+     *            Dropdown options
+     *            
      * @return string : html select
      */
     protected function dropdown($default = null, array $attributes = [], array $options = [])
@@ -32,158 +34,194 @@ trait OptionsElement
     /**
      * Generate html select.
      *
-     * @param string $default:   Default selected value
-     * @param array  $attributes
-     * @param array  $options:   Dropdown options
-     *
+     * @param string $default:
+     *            Default selected value
+     * @param array $attributes            
+     * @param array $options:
+     *            Dropdown options
+     *            
      * @return string : html select
      */
     protected function select($default = null, array $attributes = [], array $options = [])
     {
         $this->setProperties('select', $default, $attributes, $options);
-
+        
         $html = $this->addLabel();
-
+        
         $html .= "<select{$this->attributes()}>{$this->buildOptions()}</select>";
-
+        
         return $this->_publish($html);
     }
 
     /**
      * Generate multiselect.
      *
-     * @param string | array $default:   Default selected value
-     * @param array          $attributes
-     * @param array          $options:   Dropdown options
-     *
+     * @param
+     *            string | array $default: Default selected value
+     * @param array $attributes            
+     * @param array $options:
+     *            Dropdown options
+     *            
      * @return string : html multiselect
      */
     protected function multiselect($default = [], array $attributes = [], array $options = [])
     {
         $this->setProperties('multiselect', $default, $attributes, $options);
-
+        
         $html = $this->addLabel();
-
+        
         $html .= "<select{$this->attributes()} multiple=\"multiple\">{$this->buildOptions()}</select>";
-
+        
         return $this->_publish($html);
     }
 
     /**
      * Generate list of radios.
      *
-     * @param string $default:   Default checked value
-     * @param array  $attributes
-     * @param array  $options:   Dropdown options
-     *
+     * @param string $default:
+     *            Default checked value
+     * @param array $attributes            
+     * @param array $options:
+     *            Dropdown options
+     *            
      * @return string : html radio
      */
     protected function radioList($default = null, array $attributes = [], array $options = [])
     {
         $this->setProperties('radio', $default, $attributes, $options);
-
+        
         $html = $this->addLabel();
-
+        
         $html .= $this->buildOptions();
-
+        
         return $html;
     }
 
     /**
      * Generate list of checkboxes.
      *
-     * @param string | array $default:   Default checked value
-     * @param array          $attributes
-     * @param array          $options:   Dropdown options
-     *
+     * @param
+     *            string | array $default: Default checked value
+     * @param array $attributes            
+     * @param array $options:
+     *            Dropdown options
+     *            
      * @return string : html checkboxes
      */
     protected function checkboxList($default = null, array $attributes = [], array $options = [])
     {
         $this->setProperties('checkboxList', $default, $attributes, $options);
-
+        
         $html = $this->addLabel();
-
+        
         $html .= $this->buildOptions();
-
+        
         return $html;
     }
 
     /**
      * Set $this->options.
      *
-     * @param array $options: indexed, associative [value => label], indexed array
-     *                        if first element of $options is an array, then $options will directly assigned to $this->options without any modification.
+     * Examine for each option element
+     * if element contains 'value' and 'label': unchanged
+     * elseif element is an array and type=optgroup: unchanged
+     * - otherwise key=key, val=[label, ...]
+     * in case of string: key | val
+     *
+     * @param array $options:            
      */
     protected function setOptions(array $options)
     {
         if (empty($options)) {
             return;
         }
-
-        /*
-         * Determine if $options is indexed or associative array
-         */
-        $isIndexed = isset($options[0]) && isset($options[count($options) - 1]) ? true : false;
-
-        if (!is_array(reset($options))) {
-            $opt = array();
-            foreach ($options as $key => $val) {
-                $opt[] = [
-                    'value' => $isIndexed ? $val : $key,
-                    'label' => $val,
-                ];
+        
+        $isIndexedArray = $options === array_values($options);
+        $isIntegerKeys = $this->_isIntegerKeys($options);
+        
+        $opt = [];
+        foreach ($options as $key => $attr) {
+            $single = [];
+            if (isset($attr['value']) && isset($attr['label'])) {
+                $single = $attr;
+            } elseif (is_array($attr)) {
+                if (isset($attr['type']) && 'optgroup' == $attr['type']) {
+                    $single = $attr;
+                } else {
+                    $single['value'] = $key;
+                    list ($label, $attr) = $this->_splitFirstFromArray($attr);
+                    $single['label'] = $label;
+                    foreach ($attr as $k => $v) {
+                        $single[$k] = $v;
+                    }
+                }
+            } elseif ($this->isString($attr)) {
+                if ($isIndexedArray) {
+                    $single['value'] = $attr;
+                } elseif ($isIntegerKeys) {
+                    $single['value'] = $key;
+                } else {
+                    $single['value'] = is_int($key) ? $attr : $key;
+                }
+                $single['label'] = $attr;
             }
-
-            $options = $opt;
+            
+            $opt[] = $single;
         }
-
-        $this->options = $options;
+        
+        $this->options = $opt;
     }
 
     /**
      * Building options attributes.
      *
-     * @param array $options
+     * @param array $options            
      *
      * @return string : html atributes
      */
     protected function optionAttributes(array $option)
     {
-        ++$this->optionCount;
-
+        ++ $this->optionCount;
+        
         $attributes = [];
-
-        if (!in_array($this->type, ['select', 'multiselect'])) {
+        
+        if (! in_array($this->type, [
+            'select',
+            'multiselect'
+        ])) {
             $attributes = $this->_getRefinedAttributes();
         }
-
+        
         $attributes = array_merge($attributes, $option, $this->getSelectedAttribute($option));
-
+        
         $this->refineOptionsAttributes($attributes);
-
+        
         return $this->toString($attributes);
     }
 
     /**
      * Building optgroup | groups attributes.
      *
-     * @param array $options
+     * @param array $options            
      *
      * @return string : html atributes
      */
     protected function groupAttributes(array $option)
     {
-        $attributes = $this->removeKeys($option, ['type', 'label']);
-
+        $attributes = $this->removeKeys($option, [
+            'type',
+            'label'
+        ]);
+        
         return $this->toString($attributes);
     }
 
     /**
      * Apply refinement to options attributes, call by reference.
      *
-     * @param array &$attributes
-     *
+     * @param
+     *            array &$attributes
+     *            
      * @return array : $atributes
      */
     protected function refineOptionsAttributes(array &$attributes)
@@ -192,20 +230,27 @@ trait OptionsElement
             if ($this->type == 'checkboxList' && $key == 'name' && $val) {
                 $attributes[$key] = "{$val}[]";
             }
-
-            if (in_array($this->type, ['radio', 'checkboxList']) && $key == 'id' && $val) {
+            
+            if (in_array($this->type, [
+                'radio',
+                'checkboxList'
+            ]) && $key == 'id' && $val) {
                 $attributes[$key] = "{$val}_{$this->optionCount}";
             }
         }
-
-        $attributes = $this->removeKeys($attributes, ['value', 'label']);
+        
+        $attributes = $this->removeKeys($attributes, [
+            'value',
+            'label'
+        ]);
     }
 
     /**
      * Get selected/checked attribute.
      *
-     * @param array $option: single option or attributes contains key 'value'
-     *
+     * @param array $option:
+     *            single option or attributes contains key 'value'
+     *            
      * @return array : e.g. ['checked' => 'checked'] | []
      */
     protected function getSelectedAttribute(array $option)
@@ -214,38 +259,45 @@ trait OptionsElement
             case 'select':
             case 'multiselect':
                 $key = 'selected';
-            break;
-
+                break;
+            
             case 'radio':
             case 'checkbox':
             case 'radioList':
             case 'checkboxList':
                 $key = 'checked';
-            break;
-
+                break;
+            
             default:
-                throw new \Exception('selected or checked attribute is not available for '.$this->type);
+                throw new \Exception('selected or checked attribute is not available for ' . $this->type);
         }
-
+        
         if ($this->default === true) {
-            return [$key => $key];
+            return [
+                $key => $key
+            ];
         }
-
+        
         if (empty($option['value']) || empty($this->default)) {
             return [];
         }
-
+        
         if (is_array($this->default)) {
-            return in_array($option['value'], $this->default) ? [$key => $key] : [];
+            return in_array($option['value'], $this->default) ? [
+                $key => $key
+            ] : [];
         } else {
-            return $this->default == $option['value'] ? [$key => $key] : [];
+            return $this->default == $option['value'] ? [
+                $key => $key
+            ] : [];
         }
-
+        
         return [];
     }
 
     /**
-     * Front method for building option. Each options array should iterate through this method.
+     * Front method for building option.
+     * Each options array should iterate through this method.
      *
      * @return string : option html
      */
@@ -253,15 +305,15 @@ trait OptionsElement
     {
         $html = '';
         foreach ($this->options as $option) {
-            if (!empty($option['type']) && $option['type'] == 'optgroup') {
+            if (! empty($option['type']) && $option['type'] == 'optgroup') {
                 if (isset($option['label']) && $option['label'] == '__end__') {
                     $html .= $this->groupEnd();
                     $inGroup = false;
                 } else {
-                    if (!empty($inGroup)) {
+                    if (! empty($inGroup)) {
                         $html .= $this->groupEnd();
                     }
-
+                    
                     $html .= $this->groupStart($option);
                     $inGroup = true;
                 }
@@ -269,37 +321,43 @@ trait OptionsElement
                 $html .= $this->_buildSingleOption($option);
             }
         }
-
-        if (!empty($inGroup)) {
+        
+        if (! empty($inGroup)) {
             $html .= $this->groupEnd();
         }
-
+        
         return $html;
     }
 
     /**
-     * Building single option. Used only by value contaning option not groups.
+     * Building single option.
+     * Used only by value contaning option not groups.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : option html
      */
     protected function _buildSingleOption(array $option)
     {
-        $option = $this->addKeys($option, ['value', 'label']);
-        $optionRefined = $this->removeKeys($option, ['_option_before', '_option_after']);
-
-        return $this->_optionEnclose($option, 'before')
-            .$this->callMethod('Single', $optionRefined)
-            .$this->_optionEnclose($option, 'after');
+        $option = $this->addKeys($option, [
+            'value',
+            'label'
+        ]);
+        $optionRefined = $this->removeKeys($option, [
+            '_option_before',
+            '_option_after'
+        ]);
+        
+        return $this->_optionEnclose($option, 'before') . $this->callMethod('Single', $optionRefined) . $this->_optionEnclose($option, 'after');
     }
 
     /**
      * Adding option_before and option_after to single option's string.
      *
-     * @param array  $option
-     * @param string $key    : before | after
-     *
+     * @param array $option            
+     * @param string $key
+     *            : before | after
+     *            
      * @return string : text
      */
     protected function _optionEnclose(array $option, $key = 'before')
@@ -309,21 +367,23 @@ trait OptionsElement
         } elseif (isset($this->attributes["_option_$key"])) {
             return $this->attributes["_option_$key"];
         }
-
+        
         return '';
     }
 
     /**
      * Starting tag of group.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
     protected function groupStart(array $option)
     {
-        $option = $this->addKeys($option, ['label']);
-
+        $option = $this->addKeys($option, [
+            'label'
+        ]);
+        
         return $this->callMethod('GroupStart', $option);
     }
 
@@ -340,8 +400,9 @@ trait OptionsElement
     /**
      * Calling underlaying method based on slug and $this->type.
      *
-     * @param string $slug: _{$this->type}{$slug}
-     *
+     * @param string $slug:
+     *            _{$this->type}{$slug}
+     *            
      * @return callback
      */
     protected function callMethod($slug, $arg1 = null)
@@ -350,14 +411,14 @@ trait OptionsElement
         if (method_exists($this, $methodName)) {
             return $this->$methodName($arg1);
         } else {
-            throw new \Exception(get_class($this)."::$methodName() does not exists!");
+            throw new \Exception(get_class($this) . "::$methodName() does not exists!");
         }
     }
 
     /**
      * Single select option.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -369,7 +430,7 @@ trait OptionsElement
     /**
      * Single multiselect option.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -381,7 +442,7 @@ trait OptionsElement
     /**
      * Single radio.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -393,7 +454,7 @@ trait OptionsElement
     /**
      * Single checkbos.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -405,7 +466,7 @@ trait OptionsElement
     /**
      * Group start for select.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -417,7 +478,7 @@ trait OptionsElement
     /**
      * Group start for multiselect.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -429,7 +490,7 @@ trait OptionsElement
     /**
      * Group start for radio.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -441,7 +502,7 @@ trait OptionsElement
     /**
      * Group start for checkboxList.
      *
-     * @param array $option
+     * @param array $option            
      *
      * @return string : html
      */
@@ -488,5 +549,16 @@ trait OptionsElement
     protected function _checkboxListGroupEnd()
     {
         return '</div>';
+    }
+
+    /**
+     * Check if all keys of given array are integer
+     *
+     * @param array $array            
+     * @return boolean
+     */
+    private function _isIntegerKeys(array $array)
+    {
+        return count(array_filter(array_keys($array), 'is_int')) == count($array);
     }
 }
