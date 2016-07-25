@@ -61,7 +61,7 @@ class Html
     ];
 
     /**
-     * Construct method is useful for building collection.
+     * Construct method is used for building collection.
      * Thats why parameter order is different than other element.
      *
      * @param string $type            
