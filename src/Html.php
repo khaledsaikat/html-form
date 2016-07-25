@@ -294,7 +294,10 @@ class Html
                 $attr['for'] = $this->attributes['id'];
             }
             
-            return static::label($default, $attr);
+            return static::_build('label', [
+                $default,
+                $attr
+            ]);
         }
         
         return null;

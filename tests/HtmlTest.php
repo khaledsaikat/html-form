@@ -515,4 +515,29 @@ class HtmlTest extends \TestCase
         ]);
         $this->assertEquals('<label>Label</label><label><input type="checkbox" value="a" id="ID_1"/> a</label>', $html);
     }
+
+    public function testLabelInCollection()
+    {
+        $div = new Html('div');
+        $div->text('example', [
+            'label' => 'Label',
+            'name' => 'Name'
+        ]);
+        $html = $div->render();
+        $this->assertEquals('<div><label>Label</label><input type="text" name="Name" value="example"/></div>', $html);
+    }
+
+    public function testLabelAttributesInCollection()
+    {
+        $div = new Html('div');
+        $div->text('example', [
+            'label' => [
+                'Label',
+                'class' => 'Class'
+            ],
+            'name' => 'Name'
+        ]);
+        $html = $div->render();
+        $this->assertEquals('<div><label class="Class">Label</label><input type="text" name="Name" value="example"/></div>', $html);
+    }
 }
