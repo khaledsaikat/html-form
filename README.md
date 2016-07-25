@@ -15,8 +15,7 @@ PHP class to generate html elements
 [Composer](https://getcomposer.org/) is a widely used dependency manager for PHP
 packages. This Html-Form is available on Packagist as
 [`user-meta/html`](https://packagist.org/packages/user-meta/html) and can be
-installed either by running the `composer require` command or adding the library
-to your `composer.json`. To enable Composer for you project, refer to the
+installed by running the `composer require` command. To enable Composer for you project, refer to the
 project's [Getting Started](https://getcomposer.org/doc/00-intro.md)
 documentation.
 
@@ -24,21 +23,7 @@ To add this dependency using the command, run the following from within your
 project directory:
 
 ```
-composer require user-meta/html "dev-master"
-```
-
-Alternatively, add the dependency directly to your `composer.json` file:
-
-```json
-"require": {
-    "user-meta/html": "dev-master"
-}
-```
-
-Next, update Composer from the Terminal:
-
-```
-composer update
+composer require user-meta/html
 ```
 
 ## Get Started
