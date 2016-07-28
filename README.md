@@ -202,6 +202,7 @@ Pass first argument as false for default unchecked. `echo Html::checkbox(false)`
 Create a list of checkboxes with default values
 
 ```php
+echo Html::checkbox('cat', ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
 echo Html::checkbox(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
 ```
 
