@@ -1,6 +1,8 @@
 # Html-Form
 
-PHP class to generate html elements
+Lightweight PHP classes to generate html elements.
+
+This package does not have any dependency other than php-5.4
 
 - License: MIT
 

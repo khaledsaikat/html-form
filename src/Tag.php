@@ -11,15 +11,6 @@ trait Tag
 {
 
     /**
-     * Generate html tag.
-     * Alies of tag
-     */
-    protected function element($type, $default = null, array $attributes = [])
-    {
-        return $this->tag($type, $default, $attributes);
-    }
-
-    /**
      * Generate meta tag.
      *
      * @param array $attributes:            
