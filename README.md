@@ -206,9 +206,22 @@ echo Html::checkbox(['cat'], ['name' => 'Name', 'id' => 'ID'], ['dog' => 'Dog', 
 Output
 
 ```html
+<label><input type="checkbox" value="dog" name="Name" id="ID_1"/> Dog</label>
+<label><input type="checkbox" value="cat" name="Name" id="ID_2" checked="checked"/> Cat</label>
+```
+**To get array of values by POST or GET method**
+
+```php
+echo Html::checkbox(['cat'], ['name' => 'Name[]', 'id' => 'ID'], ['dog' => 'Dog', 'cat' => 'Cat']);
+```
+
+Output
+
+```html
 <label><input type="checkbox" value="dog" name="Name[]" id="ID_1"/> Dog</label>
 <label><input type="checkbox" value="cat" name="Name[]" id="ID_2" checked="checked"/> Cat</label>
 ```
+
 
 ### Using select / radio
 

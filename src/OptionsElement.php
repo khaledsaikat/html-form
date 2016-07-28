@@ -228,7 +228,8 @@ trait OptionsElement
     {
         foreach ($attributes as $key => $val) {
             if ($this->type == 'checkboxList' && $key == 'name' && $val) {
-                $attributes[$key] = "{$val}[]";
+                // We can pass `[]` directly to name attributes if needed
+                // $attributes[$key] = "{$val}[]";
             }
             
             if (in_array($this->type, [

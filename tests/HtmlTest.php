@@ -370,7 +370,7 @@ class HtmlTest extends \TestCase
             'a',
             'b'
         ]);
-        $this->assertEquals('<label><input type="checkbox" value="a" name="Name[]"/> a</label><label><input type="checkbox" value="b" name="Name[]"/> b</label>', $html);
+        $this->assertEquals('<label><input type="checkbox" value="a" name="Name"/> a</label><label><input type="checkbox" value="b" name="Name"/> b</label>', $html);
     }
 
     public function testIdAttribute()
