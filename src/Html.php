@@ -98,7 +98,7 @@ class Html
     {
         try {
             $this->default[] = is_object($html) ? $html->render() : $html;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo 'Exception: ', $e->getMessage(), "\n";
         }
     }
@@ -595,7 +595,7 @@ class Html
                 $instance,
                 $method
             ], $args);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 'Exception: ' . $e->getMessage() . "\n";
         }
     }
