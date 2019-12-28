@@ -32,35 +32,6 @@ class Html
     public $options = [];
 
     /**
-     * Valid html5 input type
-     */
-    private $inputTypes = [
-        'button',
-        'checkbox',
-        'color',
-        'date',
-        'datetime',
-        'datetime-local',
-        'email',
-        'file',
-        'hidden',
-        'image',
-        'month',
-        'number',
-        'password',
-        'radio',
-        'range',
-        'reset',
-        'search',
-        'submit',
-        'tel',
-        'text',
-        'time',
-        'url',
-        'week'
-    ];
-
-    /**
      * Construct method is used for building collection.
      * Thats why parameter order is different than other element.
      *
@@ -150,7 +121,7 @@ class Html
      */
     protected function textarea($default = null, array $attributes = [])
     {
-        return $this->tag('textarea', $default, $attributes);
+        return $this->tag('textarea', \esc_textarea($default), $attributes);
     }
 
     /**
