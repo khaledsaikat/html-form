@@ -5,11 +5,63 @@ namespace UserMeta\Html;
  * Default config for the package.
  *
  * @author Khaled Hossain
- * @since 1.2
+ * @since 1.1
  */
 trait Config
 {
 
+    /**
+     * Accepted config as attributes.
+     *
+     * @var array
+     */
+    protected $acceptedConfig = [
+        'LABEL' => 'label',
+        'BEFORE' => '_before',
+        'AFTER' => '_after',
+        'ENCLOSE' => '_enclose',
+        'OPTION_BEFORE' => '_option_before',
+        'OPTION_AFTER' => '_option_after',
+        'DISABLE_ESCAPE' => '_no_escape'
+    ];
+
+    /**
+     * Valid html5 input type.
+     * Anything other than that is considered as tag.
+     *
+     * @var array
+     */
+    protected $inputTypes = [
+        'button',
+        'checkbox',
+        'color',
+        'date',
+        'datetime',
+        'datetime-local',
+        'email',
+        'file',
+        'hidden',
+        'image',
+        'month',
+        'number',
+        'password',
+        'radio',
+        'range',
+        'reset',
+        'search',
+        'submit',
+        'tel',
+        'text',
+        'time',
+        'url',
+        'week'
+    ];
+
+    /**
+     * Attributes configurations.
+     *
+     * @var array
+     */
     protected $attributesConfig = [
         'value' => [
             '_escape_function' => 'esc_attr'

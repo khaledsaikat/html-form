@@ -367,15 +367,7 @@ class Html
         $attributes = $this->onlyNonEmpty($attributes);
         $attributes = $this->onlyString($attributes);
         $attributes = $this->escapeAttributes($attributes);
-        $attributes = $this->removeKeys($attributes, [
-            'label',
-            '_before',
-            '_after',
-            '_enclose',
-            '_option_before',
-            '_option_after',
-            '_no_escape'
-        ]);
+        $attributes = $this->removeKeys($attributes, $this->acceptedConfig);
 
         return $attributes;
     }
