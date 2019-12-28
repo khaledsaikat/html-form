@@ -9,7 +9,7 @@ namespace UserMeta\Html;
  */
 class Html
 {
-    use OptionsElement, Tag;
+    use Config, OptionsElement, Tag;
 
     /**
      * Input type.
@@ -64,8 +64,8 @@ class Html
      * Construct method is used for building collection.
      * Thats why parameter order is different than other element.
      *
-     * @param string $type            
-     * @param array $attributes            
+     * @param string $type
+     * @param array $attributes
      */
     public function __construct($type = null, array $attributes = [])
     {
@@ -77,8 +77,8 @@ class Html
     /**
      * Include collection into existing element
      *
-     * @param string $type            
-     * @param array $attributes            
+     * @param string $type
+     * @param array $attributes
      * @return \UserMeta\Html\Html
      */
     public function import($type = null, array $attributes = [])
@@ -119,7 +119,7 @@ class Html
                 $html .= $element->render();
             }
         }
-        
+
         return $type ? static::$type($html, $this->attributes) : $html;
     }
 
@@ -170,7 +170,7 @@ class Html
         if (! empty($options)) {
             return $this->checkboxList($default, $attributes, $options);
         }
-        
+
         return $this->_singleCheckboxRadio('checkbox', $default, $attributes);
     }
 
@@ -191,7 +191,7 @@ class Html
         if (! empty($options)) {
             return $this->radioList($default, $attributes, $options);
         }
-        
+
         return $this->_singleCheckboxRadio('radio', $default, $attributes);
     }
 
@@ -202,7 +202,7 @@ class Html
      *            Input type attribute
      * @param string $default:
      *            Default value attribute
-     * @param array $attributes            
+     * @param array $attributes
      *
      * @return string : Generic html input
      */
@@ -210,7 +210,7 @@ class Html
     {
         $this->setProperties($type, $default, $attributes);
         $this->_refineInputAttributes();
-        
+
         return $this->_createInput();
     }
 
@@ -218,11 +218,11 @@ class Html
     {
         $this->setProperties($type, $default, $attributes);
         $this->_refineInputAttributes();
-        
+
         $this->attributes['value'] = ! empty($attributes['value']) ? $attributes['value'] : '1';
-        
+
         $this->attributes = array_merge($this->attributes, $this->getSelectedAttribute($this->attributes));
-        
+
         return $this->_createInput();
     }
 
@@ -235,14 +235,14 @@ class Html
     {
         $html = $this->addLabel();
         $html .= '<input' . $this->attributes() . '/>';
-        
+
         return $this->_publish($html);
     }
 
     /**
      * Every generated element should call this function before returning final output
      *
-     * @param string $element            
+     * @param string $element
      * @return string
      */
     private function _publish($element)
@@ -253,7 +253,7 @@ class Html
     /**
      * Refine html before publish
      *
-     * @param string $element            
+     * @param string $element
      * @return string
      */
     private function _refinePublish($element)
@@ -261,17 +261,17 @@ class Html
         $html = '';
         if (! empty($this->attributes['_before']))
             $html .= $this->attributes['_before'];
-        
+
         $html .= $element;
-        
+
         if (! empty($this->attributes['_after']))
             $html .= $this->attributes['_after'];
-        
+
         if (! empty($this->attributes['_enclose'])) {
             list ($type, $attr) = $this->_splitFirstFromArray($this->attributes['_enclose']);
             $html = $this->tag($type, $html, $attr);
         }
-        
+
         return $html;
     }
 
@@ -286,20 +286,20 @@ class Html
     {
         if (isset($this->attributes['label'])) {
             list ($default, $attr) = $this->_splitFirstFromArray($this->attributes['label']);
-            
+
             if (isset($this->attributes['id']) && ! in_array($this->type, [
                 'radio',
                 'checkboxList'
             ])) {
                 $attr['for'] = $this->attributes['id'];
             }
-            
+
             return static::_build('label', [
                 $default,
                 $attr
             ]);
         }
-        
+
         return null;
     }
 
@@ -308,7 +308,7 @@ class Html
      * In case of string, first=$args
      * In case of array, $first=$args[0], $args=rest of $args
      *
-     * @param string|array $args            
+     * @param string|array $args
      * @return array list($first, $args)
      */
     private function _splitFirstFromArray($args)
@@ -320,7 +320,7 @@ class Html
             $first = $args;
             $args = [];
         }
-        
+
         return [
             $first,
             $args
@@ -334,8 +334,8 @@ class Html
      *            Input type attribute
      * @param string $default:
      *            Default value attribute
-     * @param array $attributes            
-     * @param array $options            
+     * @param array $attributes
+     * @param array $options
      */
     private function setProperties($type, $default, array $attributes, array $options = [])
     {
@@ -343,7 +343,7 @@ class Html
         $this->default = $default;
         $this->attributes = $attributes;
         $this->_refineAttribute();
-        
+
         $this->setOptions($options);
     }
 
@@ -381,7 +381,7 @@ class Html
     private function attributes()
     {
         $attributes = $this->_getRefinedAttributes();
-        
+
         return $this->toString($attributes);
     }
 
@@ -395,47 +395,91 @@ class Html
         $attributes = $this->attributes;
         $attributes = $this->onlyNonEmpty($attributes);
         $attributes = $this->onlyString($attributes);
+        $attributes = $this->escapeAttributes($attributes);
         $attributes = $this->removeKeys($attributes, [
             'label',
             '_before',
             '_after',
             '_enclose',
             '_option_before',
-            '_option_after'
+            '_option_after',
+            '_no_escape'
         ]);
-        
-        if (! empty($attributes['value'])) {
-            $attributes['value'] = $this->filter($attributes['value']);
-        }
-        
+
         return $attributes;
     }
 
     /**
      * Convert associative array to string.
      *
-     * @param array: $attributes            
+     * @param array: $attributes
      *
      * @return string: Attributes string
      */
     private function toString(array $attributes)
     {
         $string = '';
-        
+
         foreach ($attributes as $key => $val) {
             if ($this->isString($val)) {
                 $string .= " $key=\"$val\"";
             }
         }
-        
+
         return $string;
+    }
+
+    /**
+     * Escape attributes before display.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    private function escapeAttributes(array $attributes)
+    {
+        if (! empty($attributes['_no_escape'])) {
+            return $attributes;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $attributeConfig = ! empty($this->attributesConfig[$key]) ? $this->attributesConfig[$key] : [];
+            if (! empty($attributeConfig['_escape_function'])) {
+                $escapeFunction = $attributeConfig['_escape_function'];
+            }
+
+            if (! empty($escapeFunction)) {
+                $attributes[$key] = $this->escapeDeep($value, $escapeFunction);
+            }
+            unset($escapeFunction);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Apply escape function to data.
+     *
+     * @param array|string $data
+     * @param string $functionName
+     * @return mixed
+     */
+    private function escapeDeep($data, $functionName)
+    {
+        if (is_array($data)) {
+            echo $data;
+            return array_map($functionName, $data);
+        } elseif (is_string($data)) {
+            return call_user_func($functionName, $data);
+        }
+
+        return $data;
     }
 
     /**
      * Apply esc_attr/htmlspecialchars to both input string and array.
      *
-     * @param array: $attributes            
-     *
+     * @deprecated not in use since 1.1, use escapeDeep instead.
+     * @param array: $attributes
      * @return mixed: htmlspecialchars filtered data
      */
     private function filter($data)
@@ -445,7 +489,7 @@ class Html
         } elseif (is_string($data)) {
             return \esc_attr($data);
         }
-        
+
         return $data;
     }
 
@@ -468,7 +512,7 @@ class Html
                 $data[$key] = $default;
             }
         }
-        
+
         return $data;
     }
 
@@ -489,14 +533,14 @@ class Html
                 unset($data[$key]);
             }
         }
-        
+
         return $data;
     }
 
     /**
      * Filter all non string value from given array.
      *
-     * @param array $data            
+     * @param array $data
      *
      * @return array
      */
@@ -507,14 +551,14 @@ class Html
                 unset($data[$key]);
             }
         }
-        
+
         return $data;
     }
 
     /**
      * Filter all empty value from given array.
      *
-     * @param array $data            
+     * @param array $data
      *
      * @return array
      */
@@ -525,14 +569,14 @@ class Html
                 unset($data[$key]);
             }
         }
-        
+
         return $data;
     }
 
     /**
      * Check if given argument is string.
      *
-     * @param mixed $date            
+     * @param mixed $date
      *
      * @return bool
      */
@@ -544,7 +588,7 @@ class Html
         ])) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -556,7 +600,7 @@ class Html
         if (isset($data[$key])) {
             return $data[$key];
         }
-        
+
         return $default;
     }
 
@@ -590,7 +634,7 @@ class Html
                 array_unshift($args, $method);
                 $method = $instance->_determineInputOrTag($method);
             }
-            
+
             return call_user_func_array([
                 $instance,
                 $method
@@ -616,7 +660,7 @@ class Html
         $html = static::_build($method, $args);
         if ($html)
             $this->default[] = $html;
-        
+
         return $html;
     }
 
