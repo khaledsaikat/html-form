@@ -15,14 +15,14 @@ trait Config
      *
      * @var array
      */
-    protected $acceptedConfig = [
-        'LABEL' => 'label',
+    protected $config = [
+        'LABEL' => 'label', // hard coded on OptionsElement
         'BEFORE' => '_before',
         'AFTER' => '_after',
         'ENCLOSE' => '_enclose',
-        'OPTION_BEFORE' => '_option_before',
-        'OPTION_AFTER' => '_option_after',
-        'DISABLE_ESCAPE' => '_no_escape'
+        'OPTION_BEFORE' => '_option_before', // hard coded on OptionsElement
+        'OPTION_AFTER' => '_option_after', // hard coded on OptionsElement
+        'DISABLE_ESCAPE' => '_disable_escape'
     ];
 
     /**

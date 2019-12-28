@@ -230,16 +230,16 @@ class Html
     private function _refinePublish($element)
     {
         $html = '';
-        if (! empty($this->attributes['_before']))
-            $html .= $this->attributes['_before'];
+        if (! empty($this->attributes[$this->config['BEFORE']]))
+            $html .= $this->attributes[$this->config['BEFORE']];
 
         $html .= $element;
 
-        if (! empty($this->attributes['_after']))
-            $html .= $this->attributes['_after'];
+        if (! empty($this->attributes[$this->config['AFTER']]))
+            $html .= $this->attributes[$this->config['AFTER']];
 
-        if (! empty($this->attributes['_enclose'])) {
-            list ($type, $attr) = $this->_splitFirstFromArray($this->attributes['_enclose']);
+        if (! empty($this->attributes[$this->config['ENCLOSE']])) {
+            list ($type, $attr) = $this->_splitFirstFromArray($this->attributes[$this->config['ENCLOSE']]);
             $html = $this->tag($type, $html, $attr);
         }
 
@@ -256,7 +256,7 @@ class Html
     private function addLabel()
     {
         if (isset($this->attributes['label'])) {
-            list ($default, $attr) = $this->_splitFirstFromArray($this->attributes['label']);
+            list ($default, $attr) = $this->_splitFirstFromArray($this->attributes[$this->config['LABEL']]);
 
             if (isset($this->attributes['id']) && ! in_array($this->type, [
                 'radio',
@@ -367,7 +367,7 @@ class Html
         $attributes = $this->onlyNonEmpty($attributes);
         $attributes = $this->onlyString($attributes);
         $attributes = $this->escapeAttributes($attributes);
-        $attributes = $this->removeKeys($attributes, $this->acceptedConfig);
+        $attributes = $this->removeKeys($attributes, $this->config);
 
         return $attributes;
     }
@@ -400,7 +400,7 @@ class Html
      */
     private function escapeAttributes(array $attributes)
     {
-        if (! empty($attributes['_no_escape'])) {
+        if (! empty($attributes[$this->config['DISABLE_ESCAPE']])) {
             return $attributes;
         }
 
