@@ -363,14 +363,14 @@ Output
 
 ## Advanced
 
-Although it is possible to create any element by calling their name.
+It is possible to create any html element by calling their name.
 
 ```php
 echo Html::email('noreply@gmail.com');
 echo Html::h1('Example Heading');
 ```
 
-But under the hood, we use `Html::input()` for input element and `Html::tag()` for html tag
+Under the hood, we use `Html::input()` for input element and `Html::tag()` for html tag
 
 Create an email input by using `input` method:
 
@@ -479,3 +479,11 @@ Output
     <option value="4">Four</option>
 </select>
 ```
+
+## Security
+
+### Escaping Output
+
+Escaping means stripping out unwanted data, like malformed HTML or script tags.
+
+The library apply `esc_attr` to value attribute. `esc_url` to `href` and `src` attributes.
