@@ -4,6 +4,11 @@
  * 
  * @author Khaled Hossain
  */
+
+if (defined('ABSPATH') && file_exists( ABSPATH . 'wp-load.php' )) {
+    return;
+}
+
 if (! function_exists('esc_attr')) {
 
     /**
